@@ -39,6 +39,7 @@ echo Button::make()->label('Save')->variant(ButtonVariant::Primary);
 - [Quick start](#quick-start)
 - [How it works](#how-it-works)
 - [Configuration](#configuration)
+- [Scaffold a theme](#scaffold-an-application-theme)
 - [Components](#components)
 - [Accessibility](#accessibility)
 - [Theming](#theming)
@@ -87,8 +88,9 @@ php artisan vendor:publish --tag=backend-design-system-theme-base-dark
 php artisan vendor:publish --tag=backend-design-system-theme-base-dual
 ```
 
-The config has sensible defaults even if you do not publish it. Publishing the themes
-is what lets Tailwind scan the classes used by the bundled designs.
+The config has sensible defaults even if you do not publish it. Tailwind needs to see the
+theme classes, so either publish the themes or add an `@source` entry for the package
+views. See [Tailwind](#tailwind) for both approaches.
 
 ## Quick start
 
@@ -232,6 +234,41 @@ final class TenantThemeManager implements ThemeManager
 ```
 
 Reference it with `'manager' => TenantThemeManager::class`.
+
+### Scaffold an application theme
+
+The fastest way to create an editable theme is the Artisan command:
+
+```bash
+php artisan design-system:make-theme app
+```
+
+It copies the bundled `base` theme to `resources/views/backend-design-system/app`,
+adds an `app` design with a `path` entry to `config/backend-design-system.php`, and makes
+it the default design.
+
+Use `--to` to put the theme somewhere else under `resources/`:
+
+```bash
+php artisan design-system:make-theme tenant --to=views/designs/tenant
+```
+
+This writes to `resources/views/designs/tenant` and stores
+`'path' => 'views/designs/tenant'`.
+
+Options:
+
+| Option | Meaning |
+|---|---|
+| `--from=base` | Source design: `base`, `base-dark` or `base-dual` |
+| `--dark=none` | Override the dark mode: `none`, `always` or `adaptive` |
+| `--to=views/designs/tenant` | Destination under `resources/`; defaults to `views/backend-design-system/{name}` |
+| `--keep-default` | Add the design without changing the default |
+| `--force` | Overwrite an existing theme folder |
+
+The copied theme lives under `resources/views`, so Tailwind scans it without publishing
+the package themes. The design is app-owned from that point on; the bundled designs stay
+package-owned.
 
 ## Components
 
@@ -541,8 +578,10 @@ unstyled element.
 
 ### Tailwind
 
-The bundled theme files live in the package and are used for rendering. Publish them so
-Tailwind can scan their classes:
+The bundled theme files live in the package and are used for rendering. Tailwind needs to
+scan their classes. Choose one approach.
+
+#### Publishing the themes
 
 ```bash
 php artisan vendor:publish --tag=backend-design-system-themes
@@ -551,6 +590,23 @@ php artisan vendor:publish --tag=backend-design-system-themes
 They land in `resources/views/backend-design-system`, which is inside Tailwind's normal
 scan. No `@source` line is needed with Tailwind v4. With Tailwind v3, add
 `./resources/views/backend-design-system/**/*.blade.php` to the `content` array.
+
+#### Using the default classes
+
+If you keep the package themes in place, point Tailwind at the package views:
+
+```css
+/* resources/css/app.css */
+@source '../../vendor/juaniquillo/backend-design-system/resources/views/**/*.blade.php';
+```
+
+With Tailwind v3, add the same path to the `content` array:
+
+```js
+content: [
+    './vendor/juaniquillo/backend-design-system/resources/views/**/*.blade.php',
+],
+```
 
 The bundled managers always read the package's theme files. To change the classes
 yourself, create an application design with `path` or a custom manager. Editing the

@@ -56,12 +56,9 @@ return [
             'dark' => 'adaptive',
         ],
 
-        // Publish the themes, then uncomment this to edit the published base
-        // copy. The bundled "base" design keeps reading the package files.
-        // 'base-editable' => [
-        //     'label' => 'Base (editable)',
-        //     'path' => 'views/backend-design-system/base',
-        //     'dark' => 'none',
-        // ],
+        // design-system:designs
+
+        // Scaffold an app-owned theme with:
+        // php artisan design-system:make-theme app
     ],
 ];

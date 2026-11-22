@@ -6,8 +6,11 @@ namespace Juaniquillo\BackendDesignSystem;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
+use Juaniquillo\BackendDesignSystem\Console\Commands\MakeThemeCommand;
+use Juaniquillo\BackendDesignSystem\Console\ThemeScaffolder;
 use Juaniquillo\BackendDesignSystem\Designs\DarkMode;
 use Juaniquillo\BackendDesignSystem\Designs\Design;
 use Juaniquillo\BaseBackendComponent\Contracts\ThemeManager;
@@ -26,6 +29,14 @@ class BackendDesignSystemServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(Design::class, fn (Application $app): Design => $this->resolveDesign($app->make(Repository::class)));
+
+        $this->app->singleton(ThemeScaffolder::class, fn (Application $app): ThemeScaffolder => new ThemeScaffolder(
+            $app->make(Filesystem::class),
+            $app->configPath('backend-design-system.php'),
+            $app->resourcePath(),
+            __DIR__.'/../config/backend-design-system.php',
+            __DIR__.'/../resources/views/backend-design-system',
+        ));
     }
 
     /**
@@ -45,6 +56,12 @@ class BackendDesignSystemServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views/backend-design-system/'.$design => $this->app->resourcePath('views/backend-design-system/'.$design),
             ], 'backend-design-system-theme-'.$design);
+        }
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MakeThemeCommand::class,
+            ]);
         }
     }
 

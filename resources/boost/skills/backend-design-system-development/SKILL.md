@@ -393,6 +393,36 @@ final class TenantThemeManager implements ThemeManager
 
 Reference it with `'manager' => TenantThemeManager::class`.
 
+### Scaffold an application theme
+
+The fastest way to create an editable theme is the Artisan command:
+
+```bash
+php artisan design-system:make-theme app
+```
+
+It copies the bundled `base` theme to `resources/views/backend-design-system/app`,
+adds an app design with a `path` entry to the config, and makes it the default.
+
+Use `--to` for a custom destination under `resources/`:
+
+```bash
+php artisan design-system:make-theme tenant --to=views/designs/tenant
+```
+
+Options:
+
+| Option | Meaning |
+|---|---|
+| `--from=base` | Source: `base`, `base-dark` or `base-dual` |
+| `--dark=none` | Override dark mode: `none`, `always` or `adaptive` |
+| `--to=views/designs/tenant` | Destination under `resources/`; defaults to `views/backend-design-system/{name}` |
+| `--keep-default` | Add the design without changing the default |
+| `--force` | Overwrite an existing theme folder |
+
+The folder is under `resources/views`, so Tailwind scans it without publishing the
+bundled themes.
+
 ## Themes
 
 Theme files are `.blade.php` files that return arrays. They are not Blade templates.
@@ -452,7 +482,10 @@ component.
 
 ### Tailwind
 
-Publish the bundled themes:
+Tailwind needs to see the theme classes. Either publish the themes or point `@source` at
+the package views.
+
+#### Publishing the themes
 
 ```bash
 php artisan vendor:publish --tag=backend-design-system-themes
@@ -461,6 +494,23 @@ php artisan vendor:publish --tag=backend-design-system-themes
 They land in `resources/views/backend-design-system`, inside Tailwind's normal scan, so
 no `@source` line is needed with Tailwind v4. With Tailwind v3, add
 `./resources/views/backend-design-system/**/*.blade.php` to the `content` array.
+
+#### Using the default classes
+
+If you keep the package themes in place, point Tailwind at the package views:
+
+```css
+/* resources/css/app.css */
+@source '../../vendor/juaniquillo/backend-design-system/resources/views/**/*.blade.php';
+```
+
+With Tailwind v3, add the same path to the `content` array:
+
+```js
+content: [
+    './vendor/juaniquillo/backend-design-system/resources/views/**/*.blade.php',
+],
+```
 
 The bundled managers read from the package. Publishing is for Tailwind scanning; editing
 the published copy alone does not change what the bundled designs render. Create an

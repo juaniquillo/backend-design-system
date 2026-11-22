@@ -44,6 +44,7 @@ the `Workbench\` namespace and are never shipped.
 | Path | Purpose |
 |---|---|
 | `src/` | Package source |
+| `src/Console/` | Artisan commands and theme scaffolder |
 | `config/` | Publishable package configuration |
 | `resources/views/backend-design-system/` | Bundled theme files |
 | `resources/boost/skills/` | Boost skill for building UIs with the package |
