@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Package classes now live under `Juaniquillo\BackendDesignSystem`, grouped into `Components`, `Concerns`, `Contracts`, `Designs` and `Theme`.
 - `Button::make()` and the other components resolve the bound `Design` when none is passed.
 
+### Fixed
+
+- `Field` now wires custom error components with the error id and preserves any existing `aria-describedby` values on the input.
+
 ### Removed
 
 - `DesignRegistry` and `DesignSystemCollection`; the package no longer ships a showcase.

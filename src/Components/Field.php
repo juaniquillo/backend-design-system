@@ -108,7 +108,7 @@ final class Field implements DesignComponent
 
         if ($error !== null) {
             $contents[] = $error instanceof BackendComponent
-                ? $error
+                ? $this->wireError($error, $id)
                 : $this->buildError($error, $id);
         }
 
@@ -135,6 +135,11 @@ final class Field implements DesignComponent
         return $id === null ? $label : $label->setAttribute('for', $id);
     }
 
+    private function wireError(BackendComponent $error, ?string $id): BackendComponent
+    {
+        return $id === null ? $error : $error->setAttribute('id', $id.'-error');
+    }
+
     private function wireInput(BackendComponent $input, ?string $id, bool $invalid): BackendComponent
     {
         $attributes = [];
@@ -151,11 +156,24 @@ final class Field implements DesignComponent
             $attributes['aria-invalid'] = 'true';
 
             if ($id !== null) {
-                $attributes['aria-describedby'] = $id.'-error';
+                $attributes['aria-describedby'] = $this->describedBy($input, $id.'-error');
             }
         }
 
         return $attributes === [] ? $input : $input->setAttributes($attributes);
+    }
+
+    private function describedBy(BackendComponent $input, string $errorId): string
+    {
+        $existing = trim((string) $input->getAttribute('aria-describedby'));
+
+        $ids = $existing === '' ? [] : (preg_split('/\s+/', $existing) ?: []);
+
+        if (! in_array($errorId, $ids, true)) {
+            $ids[] = $errorId;
+        }
+
+        return implode(' ', $ids);
     }
 
     private function buildInput(string $name, ?string $id, bool $invalid): BackendComponent
