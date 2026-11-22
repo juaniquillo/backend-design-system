@@ -27,6 +27,8 @@ final class Button implements DesignComponent
 
     private bool $disabled = false;
 
+    private bool $loading = false;
+
     /** @var array<string, int|string> */
     private array $attributes = [];
 
@@ -65,16 +67,27 @@ final class Button implements DesignComponent
         return $this;
     }
 
+    /**
+     * Mark the button as busy. A loading button is disabled and carries
+     * aria-busy, so a second click cannot start the same action twice.
+     */
+    public function loading(bool $loading = true): static
+    {
+        $this->loading = $loading;
+
+        return $this;
+    }
+
     protected function build(): MainBackendComponent
     {
-        // One list of variant keys: the look, then the state. State
-        // variants are affordances, so a theme never needs a
-        // "primary-disabled" for every combination.
-        // One list of variant keys: the look, its size, and the state.
+        // One list of variant keys: the look, its size, and the state. A
+        // loading button replaces the disabled state so the two cursor
+        // utilities never compete.
         $variants = ThemeVariants::make()
             ->look($this->variant)
             ->size($this->size)
-            ->state($this->disabled ? State::Disabled : null);
+            ->state($this->disabled && ! $this->loading ? State::Disabled : null)
+            ->state($this->loading ? State::Loading : null);
 
         $button = $this->makeComponent(ComponentEnum::BUTTON)
             ->setThemeManager($this->design->themeManager)
@@ -83,8 +96,12 @@ final class Button implements DesignComponent
             ->setTheme('radius', 'md')
             ->setAttribute('type', $this->type);
 
-        if ($this->disabled) {
+        if ($this->disabled || $this->loading) {
             $button->setAttribute('disabled', 'disabled');
+        }
+
+        if ($this->loading) {
+            $button->setAttribute('aria-busy', 'true');
         }
 
         return $button->setAttributes($this->attributes);

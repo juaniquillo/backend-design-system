@@ -72,33 +72,51 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 
 | Component | Methods |
 |---|---|
+| `Accordion` | `summary(string)`, `content()`, `open(bool)` |
 | `Alert` | `variant(AlertVariant)`, `title()`, `body()`, `live(bool)` |
 | `Badge` | `label(string)`, `variant(BadgeVariant)` |
-| `Button` | `label(string)`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)` |
+| `Breadcrumb` | `items(array)` |
+| `Button` | `label(string)`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)`, `loading(bool)` |
 | `Card` | `title()`, `body()`, `footer()`, `titleLevel(int)` |
 | `Checkbox` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
+| `ChoiceGroup` | `legend(string)`, `choices(array)`, `error()`, `id(?string)` |
+| `Divider` | attributes only |
 | `Field` | `label()`, `input()`, `error()`, `id()`, `required(bool)` |
 | `Form` | `action()`, `method()`, `fields(array)`, `actions()`, `csrf(bool)`, `methodInput(bool)` |
+| `Heading` | `text(string)`, `level(int\|HeadingLevel)` |
+| `Inline` | `children(array)`, `space(Size)` |
 | `Input` | `type()`, `name()`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 | `Label` | `text()`, `for()` |
+| `Link` | `label(string)`, `href(string)`, `current(bool)`, `external(bool)` |
 | `Radio` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `Select` | `name()`, `options(array)`, `value()`, `disabled(bool)`, `required(bool)` |
+| `Stack` | `children(array)`, `space(Size)` |
+| `Text` | `text(string)`, `size(Size)`, `inline(bool)` |
 | `Textarea` | `name()`, `rows(int)`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 
 Namespaces:
 
 ```php
+use Juaniquillo\BackendDesignSystem\Components\Accordion;
 use Juaniquillo\BackendDesignSystem\Components\Alert;
 use Juaniquillo\BackendDesignSystem\Components\Badge;
+use Juaniquillo\BackendDesignSystem\Components\Breadcrumb;
 use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\Checkbox;
+use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Divider;
 use Juaniquillo\BackendDesignSystem\Components\Field;
 use Juaniquillo\BackendDesignSystem\Components\Form;
+use Juaniquillo\BackendDesignSystem\Components\Heading;
+use Juaniquillo\BackendDesignSystem\Components\Inline;
 use Juaniquillo\BackendDesignSystem\Components\Input;
 use Juaniquillo\BackendDesignSystem\Components\Label;
+use Juaniquillo\BackendDesignSystem\Components\Link;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Select;
+use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Text;
 use Juaniquillo\BackendDesignSystem\Components\Textarea;
 ```
 
@@ -108,6 +126,7 @@ use Juaniquillo\BackendDesignSystem\Components\Textarea;
 use Juaniquillo\BackendDesignSystem\Theme\AlertVariant;
 use Juaniquillo\BackendDesignSystem\Theme\BadgeVariant;
 use Juaniquillo\BackendDesignSystem\Theme\ButtonVariant;
+use Juaniquillo\BackendDesignSystem\Theme\HeadingLevel;
 use Juaniquillo\BackendDesignSystem\Theme\Size;
 ```
 
@@ -116,7 +135,9 @@ use Juaniquillo\BackendDesignSystem\Theme\Size;
 | `ButtonVariant` | `Default`, `Primary`, `Secondary`, `Danger`, `Ghost` |
 | `BadgeVariant` | `Default`, `Success`, `Info`, `Warning`, `Danger` |
 | `AlertVariant` | `Info`, `Success`, `Warning`, `Danger` |
+| `HeadingLevel` | `H1`, `H2`, `H3`, `H4`, `H5`, `H6` |
 | `Size` | `Sm`, `Md`, `Lg` |
+| `State` | `Disabled`, `Loading`, `Current` |
 
 ## Common patterns
 
@@ -126,8 +147,11 @@ use Juaniquillo\BackendDesignSystem\Theme\Size;
 Button::make()->label('Delete')->variant(ButtonVariant::Danger);
 Button::make()->label('Small')->size(Size::Sm);
 Button::make()->label('Disabled')->disabled();
+Button::make()->label('Saving')->loading();
 Button::make()->label('Submit')->type('submit');
 ```
+
+`loading()` disables the button and adds `aria-busy="true"`.
 
 ### Badge and alert
 
@@ -208,6 +232,76 @@ Radio::make()->name('plan')->value('pro')->label('Pro')->checked();
 
 `Select::options()` is keyed by option value.
 
+### Text, headings, links and dividers
+
+```php
+Heading::make()->text('Billing')->level(HeadingLevel::H2);
+Text::make()->text('Your plan renews monthly.')->size(Size::Sm);
+Text::make()->text('Inline note')->inline();
+
+Link::make()->label('Documentation')->href('/docs');
+Link::make()->label('Documentation')->href('/docs')->current();
+Link::make()->label('External')->href('https://example.com')->external();
+
+Divider::make();
+```
+
+`Text` renders a paragraph by default and a span with `inline()`. `Heading` renders
+`h1` through `h6`. Current links get `aria-current="page"`; external links get
+`target` and a safe `rel`.
+
+### Layout with Stack and Inline
+
+```php
+Stack::make()
+    ->space(Size::Sm)
+    ->children([
+        Text::make()->text('First'),
+        Text::make()->text('Second'),
+    ]);
+
+Inline::make()
+    ->space(Size::Sm)
+    ->children([
+        Button::make()->label('Cancel'),
+        Button::make()->label('Save'),
+    ]);
+```
+
+### Accordion and breadcrumb
+
+```php
+Accordion::make()
+    ->summary('Shipping details')
+    ->content('Ships in two business days.')
+    ->open();
+
+Breadcrumb::make()->items([
+    ['label' => 'Home', 'href' => '/'],
+    ['label' => 'Billing', 'href' => '/billing'],
+    ['label' => 'Invoices'],
+]);
+```
+
+`Accordion` uses native `<details>`/`<summary>`, so no JavaScript is required. The last
+breadcrumb item is the current page.
+
+### Choice groups
+
+```php
+ChoiceGroup::make()
+    ->legend('Plan')
+    ->choices([
+        Radio::make()->name('plan')->value('free')->label('Free'),
+        Radio::make()->name('plan')->value('pro')->label('Pro'),
+    ])
+    ->id('plan')
+    ->error('Choose a plan.');
+```
+
+`ChoiceGroup` wraps the choices in a `<fieldset>` with a `<legend>` and wires the error
+to the fieldset when an `id` is provided.
+
 ### Extra attributes
 
 ```php
@@ -233,6 +327,9 @@ Bundled designs:
 | `base` | Light only |
 | `base-dark` | Dark only |
 | `base-dual` | Adaptive, with `dark:` classes |
+
+Adaptive themes follow Tailwind's dark-mode strategy: `media` by default, or `class`/
+`selector` when the application uses a theme toggle.
 
 Resolve the active design when you need it:
 
@@ -317,17 +414,25 @@ Required files and keys:
 
 | File | Keys |
 |---|---|
+| `accordion` | `container`, `summary`, `content` |
 | `alert` | `info`, `success`, `warning`, `danger` |
 | `badge` | `default`, `success`, `info`, `warning`, `danger` |
-| `button` | `default`, `primary`, `secondary`, `danger`, `ghost`, `size.sm`, `size.md`, `size.lg`, `state.disabled` |
+| `breadcrumb` | `container`, `list`, `item`, `link`, `state.current`, `separator` |
+| `button` | `default`, `primary`, `secondary`, `danger`, `ghost`, `size.sm`, `size.md`, `size.lg`, `state.disabled`, `state.loading` |
 | `card` | `container`, `title`, `body`, `foot` |
 | `checkbox` | `container`, `box`, `label` |
+| `choice-group` | `container`, `legend`, `choices`, `error` |
+| `divider` | `default` |
 | `field` | `container`, `error` |
 | `form` | `container`, `actions` |
+| `heading` | `h1`, `h2`, `h3`, `h4`, `h5`, `h6` |
+| `inline` | `container` |
 | `input` | `default`, `state.disabled` |
 | `label` | `default` |
+| `link` | `default`, `state.current` |
 | `radio` | `container`, `box`, `label` |
 | `select` | `default`, `state.disabled` |
+| `stack` | `container` |
 | `textarea` | `default`, `state.disabled` |
 | `radius` | `none`, `sm`, `md`, `full` |
 | `space` | `xs`, `sm`, `md`, `lg` |
@@ -356,8 +461,12 @@ application design with `path` or a custom manager when the classes need to chan
 - `Field` wires `for`/`id`, `required`, `aria-invalid` and `aria-describedby` and gives
   the error element an id.
 - `Checkbox` and `Radio` wrap the input in a label, so the text is part of the target.
+- `ChoiceGroup` wraps grouped choices in a `<fieldset>` with a `<legend>` and wires its
+  error to the fieldset.
+- `Link::current()` adds `aria-current="page"`; `external()` adds a safe `rel`.
+- `Accordion` uses native `<details>`/`<summary>`, so disclosure works without JavaScript.
 - `Alert::live()` adds the correct live region role.
-- `required` and `disabled` become real HTML attributes.
+- `required`, `disabled` and `aria-busy` become real HTML attributes.
 
 Pass validation messages to `Field::error()`; the package does not read Laravel's error
 bag automatically.
@@ -372,6 +481,9 @@ bag automatically.
 - Editing published bundled themes and expecting the bundled manager to use them.
 - Expecting CSRF or `_method` inputs by default; call `csrf()` and `methodInput()`.
 - Using `live()` on alerts that are already present at page load.
+- Using `loading()` without a stable label; keep the button text and let the busy state
+  communicate progress.
+- Using `current()` on a link that is not the current page.
 - Passing a design to every component instead of relying on the bound design.
 
 ## Verification

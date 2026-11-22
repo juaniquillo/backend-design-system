@@ -10,4 +10,6 @@ namespace Juaniquillo\BackendDesignSystem\Theme;
 enum State: string
 {
     case Disabled = 'state.disabled';
+    case Loading = 'state.loading';
+    case Current = 'state.current';
 }

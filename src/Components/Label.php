@@ -8,6 +8,7 @@ use Juaniquillo\BackendComponents\Enums\ComponentEnum;
 use Juaniquillo\BackendComponents\MainBackendComponent;
 use Juaniquillo\BackendDesignSystem\Concerns\IsDesignComponent;
 use Juaniquillo\BackendDesignSystem\Contracts\DesignComponent;
+use Juaniquillo\BackendDesignSystem\Theme\Look;
 
 final class Label implements DesignComponent
 {
@@ -39,7 +40,7 @@ final class Label implements DesignComponent
         $label = $this->makeComponent(ComponentEnum::LABEL)
             ->setThemeManager($this->design->themeManager)
             ->setContent($this->text)
-            ->setTheme('label', 'default');
+            ->setTheme('label', Look::Default->value);
 
         if ($this->for !== null) {
             $label->setAttribute('for', $this->for);

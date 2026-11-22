@@ -210,17 +210,26 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 
 | Component | Fluent API |
 |---|---|
+| `Accordion` | `summary(string)`, `content()`, `open(bool)` |
 | `Alert` | `variant(AlertVariant)`, `title()`, `body()`, `live(bool)` |
 | `Badge` | `label(string)`, `variant(BadgeVariant)` |
-| `Button` | `label(string)`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)` |
+| `Breadcrumb` | `items(array)` |
+| `Button` | `label(string)`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)`, `loading(bool)` |
 | `Card` | `title()`, `body()`, `footer()`, `titleLevel(int)` |
 | `Checkbox` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
+| `ChoiceGroup` | `legend(string)`, `choices(array)`, `error()`, `id(?string)` |
+| `Divider` | attributes only |
 | `Field` | `label()`, `input()`, `error()`, `id()`, `required(bool)` |
 | `Form` | `action()`, `method()`, `fields(array)`, `actions()`, `csrf(bool)`, `methodInput(bool)` |
+| `Heading` | `text(string)`, `level(int\|HeadingLevel)` |
+| `Inline` | `children(array)`, `space(Size)` |
 | `Input` | `type()`, `name()`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 | `Label` | `text()`, `for()` |
+| `Link` | `label(string)`, `href(string)`, `current(bool)`, `external(bool)` |
 | `Radio` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `Select` | `name()`, `options(array)`, `value()`, `disabled(bool)`, `required(bool)` |
+| `Stack` | `children(array)`, `space(Size)` |
+| `Text` | `text(string)`, `size(Size)`, `inline(bool)` |
 | `Textarea` | `name()`, `rows(int)`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 
 ### Variants and sizes
@@ -235,16 +244,21 @@ use Juaniquillo\BackendDesignSystem\Theme\Size;
 Button::make()->label('Delete')->variant(ButtonVariant::Danger);
 Button::make()->label('Small')->size(Size::Sm);
 Button::make()->label('Disabled')->disabled();
+Button::make()->label('Saving')->loading();
 
 Badge::make()->label('Active')->variant(BadgeVariant::Success);
 ```
+
+`Button::loading()` also disables the button and adds `aria-busy="true"`.
 
 | Enum | Cases |
 |---|---|
 | `ButtonVariant` | `Default`, `Primary`, `Secondary`, `Danger`, `Ghost` |
 | `BadgeVariant` | `Default`, `Success`, `Info`, `Warning`, `Danger` |
 | `AlertVariant` | `Info`, `Success`, `Warning`, `Danger` |
+| `HeadingLevel` | `H1`, `H2`, `H3`, `H4`, `H5`, `H6` |
 | `Size` | `Sm`, `Md`, `Lg` |
+| `State` | `Disabled`, `Loading`, `Current` |
 
 ### Cards and composition
 
@@ -306,6 +320,102 @@ echo Alert::make()
 `live()` adds `role="alert"` for warning and danger alerts, and `role="status"` for the
 others. Leave it off for alerts that are already on the page at load.
 
+### Text and headings
+
+```php
+use Juaniquillo\BackendDesignSystem\Components\Heading;
+use Juaniquillo\BackendDesignSystem\Components\Text;
+use Juaniquillo\BackendDesignSystem\Theme\HeadingLevel;
+use Juaniquillo\BackendDesignSystem\Theme\Size;
+
+Heading::make()->text('Billing')->level(HeadingLevel::H2);
+Text::make()->text('Your plan renews monthly.')->size(Size::Sm);
+Text::make()->text('Inline note')->inline();
+```
+
+`Text` renders a paragraph by default and a span when `inline()` is set. `Heading`
+renders `h1` through `h6`; `level()` accepts a `HeadingLevel` case or an integer clamped
+to that range.
+
+### Links and dividers
+
+```php
+use Juaniquillo\BackendDesignSystem\Components\Divider;
+use Juaniquillo\BackendDesignSystem\Components\Link;
+
+Link::make()->label('Documentation')->href('/docs');
+Link::make()->label('Documentation')->href('/docs')->current();
+Link::make()->label('External')->href('https://example.com')->external();
+
+Divider::make();
+```
+
+Current links receive `aria-current="page"`. External links receive
+`target="_blank"` and `rel="noopener noreferrer"`.
+
+### Layout
+
+```php
+use Juaniquillo\BackendDesignSystem\Components\Inline;
+use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Text;
+use Juaniquillo\BackendDesignSystem\Theme\Size;
+
+Stack::make()
+    ->space(Size::Sm)
+    ->children([
+        Text::make()->text('First'),
+        Text::make()->text('Second'),
+    ]);
+
+Inline::make()
+    ->space(Size::Sm)
+    ->children([
+        Button::make()->label('Cancel'),
+        Button::make()->label('Save'),
+    ]);
+```
+
+### Disclosure and breadcrumbs
+
+```php
+use Juaniquillo\BackendDesignSystem\Components\Accordion;
+use Juaniquillo\BackendDesignSystem\Components\Breadcrumb;
+
+Accordion::make()
+    ->summary('Shipping details')
+    ->content('Ships in two business days.')
+    ->open();
+
+Breadcrumb::make()->items([
+    ['label' => 'Home', 'href' => '/'],
+    ['label' => 'Billing', 'href' => '/billing'],
+    ['label' => 'Invoices'],
+]);
+```
+
+`Accordion` uses native `<details>`/`<summary>`, so no JavaScript is required. The last
+breadcrumb item is the current page.
+
+### Choice groups
+
+```php
+use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Radio;
+
+ChoiceGroup::make()
+    ->legend('Plan')
+    ->choices([
+        Radio::make()->name('plan')->value('free')->label('Free'),
+        Radio::make()->name('plan')->value('pro')->label('Pro'),
+    ])
+    ->id('plan')
+    ->error('Choose a plan.');
+```
+
+`ChoiceGroup` wraps its choices in a `<fieldset>` with a `<legend>`, and wires the error
+to the fieldset when an `id` is provided.
+
 ### Extra attributes
 
 `attributes()` merges HTML and Livewire attributes onto the primary element:
@@ -322,9 +432,14 @@ Button::make()
   `aria-invalid` and `aria-describedby` when you pass an error.
 - `Checkbox` and `Radio` wrap their input in a label, so the text is part of the click
   target.
+- `ChoiceGroup` wraps grouped choices in a `<fieldset>` with a `<legend>` and wires its
+  error to the fieldset.
+- `Link::current()` adds `aria-current="page"`, and external links add a safe `rel`.
+- `Accordion` uses native `<details>`/`<summary>`, so disclosure works without JavaScript.
 - `Alert::live()` produces the correct live region role.
 - `required` and `disabled` are rendered as real HTML attributes, not just visual
   state.
+- `Button::loading()` disables the button and adds `aria-busy="true"`.
 
 The package does not read Laravel's validation error bag automatically. Pass the error
 text to `Field::error()`.
@@ -353,6 +468,7 @@ return [
     Size::Lg->value => 'px-4 py-2 text-base',
 
     State::Disabled->value => 'opacity-50 cursor-not-allowed',
+    State::Loading->value => 'opacity-75 cursor-wait',
 ];
 ```
 
@@ -360,17 +476,25 @@ A design folder must provide:
 
 | File | Required keys |
 |---|---|
+| `accordion` | `container`, `summary`, `content` |
 | `alert` | `info`, `success`, `warning`, `danger` |
 | `badge` | `default`, `success`, `info`, `warning`, `danger` |
-| `button` | `default`, `primary`, `secondary`, `danger`, `ghost`, `size.sm`, `size.md`, `size.lg`, `state.disabled` |
+| `breadcrumb` | `container`, `list`, `item`, `link`, `state.current`, `separator` |
+| `button` | `default`, `primary`, `secondary`, `danger`, `ghost`, `size.sm`, `size.md`, `size.lg`, `state.disabled`, `state.loading` |
 | `card` | `container`, `title`, `body`, `foot` |
 | `checkbox` | `container`, `box`, `label` |
+| `choice-group` | `container`, `legend`, `choices`, `error` |
+| `divider` | `default` |
 | `field` | `container`, `error` |
 | `form` | `container`, `actions` |
+| `heading` | `h1`, `h2`, `h3`, `h4`, `h5`, `h6` |
+| `inline` | `container` |
 | `input` | `default`, `state.disabled` |
 | `label` | `default` |
+| `link` | `default`, `state.current` |
 | `radio` | `container`, `box`, `label` |
 | `select` | `default`, `state.disabled` |
+| `stack` | `container` |
 | `textarea` | `default`, `state.disabled` |
 | `radius` | `none`, `sm`, `md`, `full` |
 | `space` | `xs`, `sm`, `md`, `lg` |
@@ -404,6 +528,9 @@ published copies alone does not change what the bundled designs render.
 | `adaptive` | Light and dark classes in the same theme files |
 
 `base`, `base-dark` and `base-dual` demonstrate the three modes.
+
+Adaptive designs emit `dark:` utilities and follow your Tailwind dark-mode strategy:
+`media` by default, or `class`/`selector` when the application uses a theme toggle.
 
 ## Testing
 

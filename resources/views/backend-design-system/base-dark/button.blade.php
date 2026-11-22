@@ -15,4 +15,5 @@ return [
     Size::Md->value => 'px-3 py-2 text-sm',
     Size::Lg->value => 'px-4 py-2 text-base',
     State::Disabled->value => 'opacity-50 cursor-not-allowed',
+    State::Loading->value => 'opacity-75 cursor-wait',
 ];

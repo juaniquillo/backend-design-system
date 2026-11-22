@@ -7,6 +7,7 @@ use Juaniquillo\BackendDesignSystem\Designs\Design;
 use Juaniquillo\BackendDesignSystem\Theme\AlertVariant;
 use Juaniquillo\BackendDesignSystem\Theme\BadgeVariant;
 use Juaniquillo\BackendDesignSystem\Theme\ButtonVariant;
+use Juaniquillo\BackendDesignSystem\Theme\HeadingLevel;
 use Juaniquillo\BackendDesignSystem\Theme\Look;
 use Juaniquillo\BackendDesignSystem\Theme\Size;
 use Juaniquillo\BackendDesignSystem\Theme\State;
@@ -38,13 +39,19 @@ it('follows the dark mode rule', function (string $designKey) {
 
     if ($design->darkMode === DarkMode::Adaptive) {
         foreach ([
+            'accordion',
             'alert',
             'badge',
+            'breadcrumb',
             'button',
             'card',
             'checkbox',
+            'choice-group',
+            'divider',
             'field',
+            'heading',
             'input',
+            'link',
             'radio',
             'select',
             'textarea',
@@ -77,21 +84,30 @@ dataset('bundled designs', [
 ]);
 
 dataset('theme keys', [
+    'accordion' => ['accordion', ['container', 'summary', 'content']],
     'alert' => ['alert', array_map(fn (AlertVariant $case): string => $case->value, AlertVariant::cases())],
     'badge' => ['badge', array_map(fn (BadgeVariant $case): string => $case->value, BadgeVariant::cases())],
+    'breadcrumb' => ['breadcrumb', ['container', 'list', 'item', 'link', State::Current->value, 'separator']],
     'button' => ['button', [
         ...array_map(fn (ButtonVariant $case): string => $case->value, ButtonVariant::cases()),
         ...array_map(fn (Size $case): string => $case->value, Size::cases()),
         State::Disabled->value,
+        State::Loading->value,
     ]],
     'card' => ['card', ['container', 'title', 'body', 'foot']],
     'checkbox' => ['checkbox', ['container', 'box', 'label']],
+    'choice-group' => ['choice-group', ['container', 'legend', 'choices', 'error']],
+    'divider' => ['divider', [Look::Default->value]],
     'field' => ['field', ['container', 'error']],
     'form' => ['form', ['container', 'actions']],
+    'heading' => ['heading', array_map(fn (HeadingLevel $case): string => $case->value, HeadingLevel::cases())],
+    'inline' => ['inline', ['container']],
     'input' => ['input', [Look::Default->value, State::Disabled->value]],
-    'label' => ['label', ['default']],
+    'label' => ['label', [Look::Default->value]],
+    'link' => ['link', [Look::Default->value, State::Current->value]],
     'radio' => ['radio', ['container', 'box', 'label']],
     'select' => ['select', [Look::Default->value, State::Disabled->value]],
+    'stack' => ['stack', ['container']],
     'textarea' => ['textarea', [Look::Default->value, State::Disabled->value]],
     'radius' => ['radius', ['none', 'sm', 'md', 'full']],
     'space' => ['space', ['xs', 'sm', 'md', 'lg']],

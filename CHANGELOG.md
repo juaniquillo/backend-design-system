@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `config/backend-design-system.php`, published under the `backend-design-system-config` tag.
 - Bundled `base`, `base-dark` and `base-dual` designs, with theme managers and publishable theme files under `backend-design-system-themes`.
 - A container binding for the current `Design`, resolved from `backend-design-system.default`.
+- `Text`, `Heading`, `Link`, `Divider`, `Stack`, `Inline`, `Accordion`, `Breadcrumb` and `ChoiceGroup` components, with theme files for all three designs.
+- `State::Loading` and `State::Current`, plus `Button::loading()`, `Link::current()` and `Link::external()`.
+- `HeadingLevel` for type-safe heading theme keys.
 
 ### Changed
 
