@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.php text diff=php
+
+/.gitattributes     export-ignore
+/GUIDE.md            export-ignore

@@ -1,0 +1,119 @@
+name: Template
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-test:
+    name: configure.php self-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, fileinfo, sqlite, pdo_sqlite, bcmath, intl
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+      - name: Configure a copy
+        run: |
+          set -euo pipefail
+          rsync -a --exclude vendor --exclude .git --exclude build --exclude .phpunit.cache ./ /tmp/package/
+          cd /tmp/package
+          printf '{}\n' > composer.lock
+          php configure.php \
+            --vendor=acme \
+            --name="Acme Widgets" \
+            --slug=acme-widgets \
+            --namespace="Acme\\Widgets" \
+            --author="Jane Doe" \
+            --email=jane@example.com \
+            --description="Widgets for Acme." \
+            --year=2026 \
+            --no-interaction
+
+      - name: Assert the skeleton is gone
+        run: |
+          set -euo pipefail
+          cd /tmp/package
+          test ! -f configure.php
+          test ! -f GUIDE.md
+          test ! -f .github/workflows/template.yml
+          test ! -f composer.lock
+          test -f src/AcmeWidgetsServiceProvider.php
+          ! grep -q 'post-create-project-cmd' composer.json
+          ! grep -R -n -E 'juaniquillo|LaravelPackageTemplate|:author_name|:year|template:start' --exclude-dir=vendor .
+
+      - name: Install and run the gate
+        run: |
+          set -euo pipefail
+          cd /tmp/package
+          composer install --prefer-dist --no-interaction --no-progress
+          composer qa
+
+      - name: Assert a vendor-only rename keeps the author email
+        run: |
+          set -euo pipefail
+          rsync -a --exclude vendor --exclude .git --exclude build --exclude .phpunit.cache ./ /tmp/vendor-only/
+          cd /tmp/vendor-only
+          php configure.php --vendor=acme --no-interaction
+          grep -q '"email": "juaniquillo@gmail.com"' composer.json
+
+      - name: Assert defaults come from the directory name
+        run: |
+          set -euo pipefail
+          rsync -a --exclude vendor --exclude .git --exclude build --exclude .phpunit.cache ./ /tmp/acme-widgets/
+          cd /tmp/acme-widgets
+          php configure.php --vendor=acme --no-interaction
+          grep -q '"name": "acme/acme-widgets"' composer.json
+          test -f src/AcmeWidgetsServiceProvider.php
+          test ! -f configure.php
+
+      - name: Assert missing options are reported
+        run: |
+          set -euo pipefail
+          rsync -a --exclude vendor --exclude .git --exclude build --exclude .phpunit.cache ./ /tmp/options/
+          cd /tmp/options
+          if php configure.php --no-interaction 2> error.log; then
+            echo "::error::configure.php must require --vendor with --no-interaction"
+            exit 1
+          fi
+          grep -q 'Missing required option' error.log
+          test -f configure.php
+
+      - name: Assert instructions are printed
+        run: |
+          set -euo pipefail
+          rsync -a --exclude vendor --exclude .git --exclude build --exclude .phpunit.cache ./ /tmp/instructions/
+          cd /tmp/instructions
+          php configure.php --instructions | tee output.log
+          grep -q 'php configure.php --vendor=acme' output.log
+          test -f configure.php
+
+      - name: Assert the guard
+        run: |
+          set -euo pipefail
+          rsync -a --exclude vendor --exclude .git --exclude build --exclude .phpunit.cache ./ /tmp/laravel-package-template/
+          cd /tmp/laravel-package-template
+          if php configure.php --vendor=juaniquillo --slug=laravel-package-template --no-interaction 2> error.log; then
+            echo "::error::configure.php must refuse to configure the template repository itself"
+            exit 1
+          fi
+          grep -q 'template itself' error.log
+          test -f configure.php
+          test -f GUIDE.md
