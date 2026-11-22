@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Text`, `Heading`, `Link`, `Divider`, `Stack`, `Inline`, `Accordion`, `Breadcrumb` and `ChoiceGroup` components, with theme files for all three designs.
 - `State::Loading` and `State::Current`, plus `Button::loading()`, `Link::current()` and `Link::external()`.
 - `HeadingLevel` for type-safe heading theme keys.
+- Independent publish tags for the config, all themes, and each bundled design.
 
 ### Changed
 

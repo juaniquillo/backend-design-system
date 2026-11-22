@@ -83,6 +83,10 @@
             "phpstan/extension-installer": true
         }
     },
+    "support": {
+        "issues": "https://github.com/juaniquillo/backend-design-system/issues",
+        "source": "https://github.com/juaniquillo/backend-design-system"
+    },
     "extra": {
         "laravel": {
             "providers": [

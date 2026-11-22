@@ -40,6 +40,12 @@ class BackendDesignSystemServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views/backend-design-system' => $this->app->resourcePath('views/backend-design-system'),
         ], 'backend-design-system-themes');
+
+        foreach (['base', 'base-dark', 'base-dual'] as $design) {
+            $this->publishes([
+                __DIR__.'/../resources/views/backend-design-system/'.$design => $this->app->resourcePath('views/backend-design-system/'.$design),
+            ], 'backend-design-system-theme-'.$design);
+        }
     }
 
     private function resolveDesign(Repository $config): Design

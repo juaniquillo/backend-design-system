@@ -32,6 +32,27 @@ echo Button::make()->label('Save')->variant(ButtonVariant::Primary);
 - **Tailwind friendly.** Published themes live under `resources/views`, so Tailwind's
   default scan finds their classes without an `@source` line.
 
+## Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [How it works](#how-it-works)
+- [Configuration](#configuration)
+- [Components](#components)
+- [Accessibility](#accessibility)
+- [Theming](#theming)
+- [Testing](#testing)
+- [Workbench](#workbench)
+- [AI skill](#ai-skill)
+- [Structure](#structure)
+- [Support](#support)
+- [Security](#security)
+- [Credits](#credits)
+- [Changelog](#changelog)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Requirements
 
 - PHP `^8.3`
@@ -51,11 +72,19 @@ The service provider is auto-discovered:
 Juaniquillo\BackendDesignSystem\BackendDesignSystemServiceProvider::class
 ```
 
-Publish the config and the bundled theme files:
+Publish only what you need. Each tag is independent:
 
 ```bash
+# Just the config
 php artisan vendor:publish --tag=backend-design-system-config
+
+# All bundled themes
 php artisan vendor:publish --tag=backend-design-system-themes
+
+# Or one theme only
+php artisan vendor:publish --tag=backend-design-system-theme-base
+php artisan vendor:publish --tag=backend-design-system-theme-base-dark
+php artisan vendor:publish --tag=backend-design-system-theme-base-dual
 ```
 
 The config has sensible defaults even if you do not publish it. Publishing the themes
@@ -250,6 +279,7 @@ Badge::make()->label('Active')->variant(BadgeVariant::Success);
 ```
 
 `Button::loading()` also disables the button and adds `aria-busy="true"`.
+`Button::type()` defaults to `button`; set `type('submit')` when it submits a form.
 
 | Enum | Cases |
 |---|---|
@@ -264,6 +294,8 @@ Badge::make()->label('Active')->variant(BadgeVariant::Success);
 
 `component()` returns the underlying backend component, which is what nested slots
 accept:
+
+`Card::titleLevel()` defaults to 3 and is clamped to the six HTML heading levels.
 
 ```php
 use Juaniquillo\BackendDesignSystem\Components\Card;
@@ -303,6 +335,10 @@ want them:
 ```php
 Form::make()->csrf()->methodInput();
 ```
+
+For POST forms in a Laravel app, call `csrf()`; without the token Laravel rejects the
+request with 419. `methodInput()` emits the hidden `_method` field needed for PUT, PATCH
+and DELETE.
 
 ### Alerts
 
@@ -513,11 +549,36 @@ php artisan vendor:publish --tag=backend-design-system-themes
 ```
 
 They land in `resources/views/backend-design-system`, which is inside Tailwind's normal
-scan. No `@source` line is needed.
+scan. No `@source` line is needed with Tailwind v4. With Tailwind v3, add
+`./resources/views/backend-design-system/**/*.blade.php` to the `content` array.
 
 The bundled managers always read the package's theme files. To change the classes
 yourself, create an application design with `path` or a custom manager. Editing the
 published copies alone does not change what the bundled designs render.
+
+### Editing a bundled design
+
+Publishing copies the themes into your application, but the bundled designs stay
+package-owned. To copy only one design, use
+`php artisan vendor:publish --tag=backend-design-system-theme-base`. To edit the copy,
+point an application design at the published folder and make it the default:
+
+```php
+'designs' => [
+    'base-editable' => [
+        'label' => 'Base (editable)',
+        'path' => 'views/backend-design-system/base',
+        'dark' => 'none',
+    ],
+],
+```
+
+Then edit `resources/views/backend-design-system/base/*.blade.php`. The same pattern works
+for `base-dark` (`dark => 'always'`) and `base-dual` (`dark => 'adaptive'`). Republish
+with `--force` if you want to reset the copy to the package version.
+
+For a fully independent design, keep your own theme folder and manager; that remains the
+recommended path for production themes.
 
 ### Dark mode
 
@@ -571,6 +632,23 @@ php artisan boost:add-skill https://github.com/juaniquillo/backend-design-system
 | `tests/` | Pest feature, unit and architecture tests |
 | `workbench/` | Disposable Laravel app powered by Orchestra Testbench |
 | `.agents/skills/` | Laravel best-practices skill for package development |
+
+## Support
+
+- [Issues](https://github.com/juaniquillo/backend-design-system/issues)
+- [Source](https://github.com/juaniquillo/backend-design-system)
+
+## Security
+
+Please report vulnerabilities privately through
+[GitHub's security advisories](https://github.com/juaniquillo/backend-design-system/security/advisories/new)
+rather than opening a public issue.
+
+## Credits
+
+- [Victor Sánchez](https://github.com/juaniquillo)
+- [`juaniquillo/laravel-backend-component`](https://github.com/juaniquillo/laravel-backend-component)
+- [`juaniquillo/base-backend-component`](https://github.com/juaniquillo/base-backend-component)
 
 ## Changelog
 

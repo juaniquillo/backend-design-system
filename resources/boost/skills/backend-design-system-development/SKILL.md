@@ -27,12 +27,15 @@ Do not edit files under `vendor/`. Application designs and theme files belong in
 ```bash
 composer require juaniquillo/backend-design-system
 
+# Independent publish tags
 php artisan vendor:publish --tag=backend-design-system-config
 php artisan vendor:publish --tag=backend-design-system-themes
+php artisan vendor:publish --tag=backend-design-system-theme-base
 ```
 
 The provider is auto-discovered. The config defaults work without publishing it.
-Publishing the themes is what lets Tailwind scan the bundled classes.
+Publishing the themes is what lets Tailwind scan the bundled classes. Use the
+`backend-design-system-theme-{base,base-dark,base-dual}` tag to publish a single design.
 
 ## Core rules
 
@@ -151,7 +154,8 @@ Button::make()->label('Saving')->loading();
 Button::make()->label('Submit')->type('submit');
 ```
 
-`loading()` disables the button and adds `aria-busy="true"`.
+`loading()` disables the button and adds `aria-busy="true"`. `type()` defaults to
+`button`; set `type('submit')` for form submission.
 
 ### Badge and alert
 
@@ -178,6 +182,7 @@ Card::make()
 ```
 
 `component()` is required when passing a design component into another component.
+`Card::titleLevel()` defaults to 3 and is clamped to 1–6.
 
 ### Field with a built control
 
@@ -214,6 +219,10 @@ application needs them:
 ```php
 Form::make()->csrf()->methodInput();
 ```
+
+For POST forms in a Laravel app, call `csrf()`; without the token Laravel rejects the
+request with 419. `methodInput()` emits the hidden `_method` field needed for PUT, PATCH
+and DELETE.
 
 ### Inputs, selects and textareas
 
@@ -450,11 +459,32 @@ php artisan vendor:publish --tag=backend-design-system-themes
 ```
 
 They land in `resources/views/backend-design-system`, inside Tailwind's normal scan, so
-no `@source` line is needed.
+no `@source` line is needed with Tailwind v4. With Tailwind v3, add
+`./resources/views/backend-design-system/**/*.blade.php` to the `content` array.
 
 The bundled managers read from the package. Publishing is for Tailwind scanning; editing
 the published copy alone does not change what the bundled designs render. Create an
 application design with `path` or a custom manager when the classes need to change.
+
+### Editing a bundled design
+
+To edit a published copy, point an application design at it and make that design the
+default. Publish a single design with
+`php artisan vendor:publish --tag=backend-design-system-theme-base`:
+
+```php
+'designs' => [
+    'base-editable' => [
+        'label' => 'Base (editable)',
+        'path' => 'views/backend-design-system/base',
+        'dark' => 'none',
+    ],
+],
+```
+
+Then edit `resources/views/backend-design-system/base/*.blade.php`. Use `always` for
+`base-dark` and `adaptive` for `base-dual`. For a production theme, prefer your own theme
+folder and a custom `ThemeManager`.
 
 ## Accessibility
 

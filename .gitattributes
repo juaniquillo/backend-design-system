@@ -3,3 +3,14 @@
 
 /.gitattributes     export-ignore
 /GUIDE.md            export-ignore
+/.agents             export-ignore
+/.github             export-ignore
+/bin                 export-ignore
+/tests               export-ignore
+/workbench           export-ignore
+/phpstan.neon.dist   export-ignore
+/phpunit.xml.dist    export-ignore
+/rector.php          export-ignore
+/pint.json           export-ignore
+/testbench.yaml      export-ignore
+/CLAUDE.md           export-ignore

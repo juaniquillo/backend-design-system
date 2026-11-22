@@ -25,10 +25,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Each design is a label, a dark-mode rule and either a ThemeManager class
-    | that knows its own folder or a path under resources/views. Publish the
-    | bundled themes so Tailwind can scan their classes:
+    | that knows its own folder or a path under resources/views. The bundled
+    | designs read from the package, so they stay immutable. Publish the
+    | themes for Tailwind, then point an application design at the copy if
+    | you want to edit it:
     |
     | php artisan vendor:publish --tag=backend-design-system-themes
+    |
+    | Publish one bundled design instead with:
+    | php artisan vendor:publish --tag=backend-design-system-theme-base
     |
     */
 
@@ -50,5 +55,13 @@ return [
             'manager' => BaseDualThemeManager::class,
             'dark' => 'adaptive',
         ],
+
+        // Publish the themes, then uncomment this to edit the published base
+        // copy. The bundled "base" design keeps reading the package files.
+        // 'base-editable' => [
+        //     'label' => 'Base (editable)',
+        //     'path' => 'views/backend-design-system/base',
+        //     'dark' => 'none',
+        // ],
     ],
 ];
