@@ -1,13 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "juaniquillo/laravel-package-template",
-    "description": "Opinionated starting point for a Laravel package.",
+    "name": "juaniquillo/backend-design-system",
+    "description": "Laravel design system: PHP components, Tailwind theme files, config-driven designs.",
     "keywords": [
         "laravel",
         "juaniquillo",
-        "laravel-package-template"
+        "backend-design-system"
     ],
-    "homepage": "https://github.com/juaniquillo/laravel-package-template",
+    "homepage": "https://github.com/juaniquillo/backend-design-system",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -20,7 +20,9 @@
     "require": {
         "php": "^8.3",
         "illuminate/contracts": "^12.0||^13.0",
-        "illuminate/support": "^12.0||^13.0"
+        "illuminate/support": "^12.0||^13.0",
+        "juaniquillo/base-backend-component": "^0.1.0",
+        "juaniquillo/laravel-backend-component": "^0.12.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
@@ -35,12 +37,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Juaniquillo\\LaravelPackageTemplate\\": "src/"
+            "Juaniquillo\\BackendDesignSystem\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Juaniquillo\\LaravelPackageTemplate\\Tests\\": "tests/",
+            "Juaniquillo\\BackendDesignSystem\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/",
             "Workbench\\Database\\Factories\\": "workbench/database/factories/",
             "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -50,9 +52,6 @@
         "post-autoload-dump": [
             "@clear",
             "@prepare"
-        ],
-        "post-create-project-cmd": [
-            "@php configure.php --instructions"
         ],
         "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
@@ -87,7 +86,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Juaniquillo\\LaravelPackageTemplate\\LaravelPackageTemplateServiceProvider"
+                "Juaniquillo\\BackendDesignSystem\\BackendDesignSystemServiceProvider"
             ]
         }
     },

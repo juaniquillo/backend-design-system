@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Juaniquillo\LaravelPackageTemplate\Tests;
+namespace Juaniquillo\BackendDesignSystem\Tests;
 
 use Illuminate\Foundation\Application;
-use Juaniquillo\LaravelPackageTemplate\LaravelPackageTemplateServiceProvider;
+use Juaniquillo\BackendComponents\BackendComponentsServiceProvider;
+use Juaniquillo\BackendDesignSystem\BackendDesignSystemServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -17,7 +18,8 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            LaravelPackageTemplateServiceProvider::class,
+            BackendDesignSystemServiceProvider::class,
+            BackendComponentsServiceProvider::class,
         ];
     }
 }

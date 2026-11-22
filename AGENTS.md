@@ -1,4 +1,4 @@
-# Laravel Package Template
+# Backend Design System
 
 An opinionated Laravel package, kept small, idiomatic, and easy to install, test and maintain.
 
@@ -19,8 +19,8 @@ An opinionated Laravel package, kept small, idiomatic, and easy to install, test
 ## Conventions
 
 - `declare(strict_types=1)` in every PHP file; Pint enforces it.
-- Package code lives under `Juaniquillo\LaravelPackageTemplate` (`src/`); tests under
-  `Juaniquillo\LaravelPackageTemplate\Tests`.
+- Package code lives under `Juaniquillo\BackendDesignSystem` (`src/`); tests under
+  `Juaniquillo\BackendDesignSystem\Tests`.
 - One class per file, PSR-4, no helpers or facades until the package actually needs them.
 - Prefer Laravel contracts and constructor injection over facades inside `src/`.
 - Public API changes need tests and a CHANGELOG entry.
@@ -46,7 +46,7 @@ the `Workbench\` namespace and are never shipped.
 | `src/` | Package source |
 | `tests/` | Pest tests (Arch, Feature, Unit) |
 | `workbench/` | Testbench application |
-| `.agents/skills/`, `resources/boost/skills/` | AI skills: `laravel-best-practices` for Laravel code, `laravel-package-template-development` for this repository |
+| `.agents/skills/`, `resources/boost/skills/` | AI skills: `laravel-best-practices` for Laravel code, `backend-design-system-development` for this repository |
 | `bin/pest.php` | Cross-platform Pest runner |
 
 ## Adding a capability
