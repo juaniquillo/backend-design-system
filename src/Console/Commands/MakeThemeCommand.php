@@ -67,8 +67,10 @@ final class MakeThemeCommand extends Command
 
         if ($keepDefault) {
             $this->line("Set 'default' => '{$name}' to use it.");
-        } else {
+        } elseif ($result['defaultChanged']) {
             $this->info("Default design set to [{$name}].");
+        } else {
+            $this->warn("Default design was not changed because 'default' is not a string literal. Set it manually.");
         }
 
         $this->line('Run php artisan config:clear if the config is cached.');

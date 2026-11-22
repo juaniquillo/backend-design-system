@@ -29,12 +29,14 @@ it('scaffolds a theme and registers it', function () {
 
     expect($result['theme'])->toBe($this->themesPath.'/app')
         ->and($result['path'])->toBe('views/backend-design-system/app')
+        ->and($result['defaultChanged'])->toBeTrue()
         ->and($this->files->exists($result['theme'].'/button.blade.php'))->toBeTrue()
         ->and($this->files->exists($this->configPath))->toBeTrue();
 
     $config = require $this->configPath;
 
     expect($config['default'])->toBe('app')
+        ->and($config['designs'])->toHaveKeys(['base', 'base-dark', 'base-dual', 'app'])
         ->and($config['designs']['app']['label'])->toBe('App')
         ->and($config['designs']['app']['path'])->toBe('views/backend-design-system/app')
         ->and($config['designs']['app']['dark'])->toBe('none')
@@ -83,6 +85,79 @@ it('normalizes a custom destination path', function () {
 
     expect($result['path'])->toBe('views/designs/tenant')
         ->and($result['theme'])->toBe($this->resourcesPath.'/views/designs/tenant');
+});
+
+it('checks the designs array instead of top-level config keys', function () {
+    $this->files->ensureDirectoryExists(dirname($this->configPath));
+    $this->files->put($this->configPath, <<<'PHP'
+<?php
+
+return [
+    'default' => 'base',
+    'app' => 'not-a-design',
+    'designs' => [
+        // design-system:designs
+    ],
+];
+PHP);
+
+    $this->scaffolder->make('app');
+
+    $config = require $this->configPath;
+
+    expect($config['designs'])->toHaveKey('app');
+});
+
+it('leaves a non-literal default untouched', function () {
+    $this->files->ensureDirectoryExists(dirname($this->configPath));
+    $this->files->put($this->configPath, <<<'PHP'
+<?php
+
+return [
+    'default' => env('DESIGN_SYSTEM_DEFAULT', 'base'),
+    'designs' => [
+        // design-system:designs
+    ],
+];
+PHP);
+
+    $result = $this->scaffolder->make('app');
+
+    expect($result['defaultChanged'])->toBeFalse();
+
+    $contents = $this->files->get($this->configPath);
+
+    expect($contents)->toContain("'default' => env('DESIGN_SYSTEM_DEFAULT', 'base')");
+
+    $config = require $this->configPath;
+
+    expect($config['designs'])->toHaveKey('app');
+});
+
+it('matches the indentation of the config', function () {
+    $this->files->ensureDirectoryExists(dirname($this->configPath));
+    $this->files->put($this->configPath, <<<'PHP'
+<?php
+
+return [
+  'default' => 'base',
+  'designs' => [
+    // design-system:designs
+  ],
+];
+PHP);
+
+    $this->scaffolder->make('app');
+
+    $contents = $this->files->get($this->configPath);
+
+    expect($contents)->toContain(
+        "\n    'app' => [\n".
+        "      'label' => 'App',\n".
+        "      'path' => 'views/backend-design-system/app',\n".
+        "      'dark' => 'none',\n".
+        "    ],\n",
+    );
 });
 
 it('refuses reserved names and invalid options', function () {

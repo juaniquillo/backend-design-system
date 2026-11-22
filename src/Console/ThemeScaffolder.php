@@ -7,6 +7,7 @@ namespace Juaniquillo\BackendDesignSystem\Console;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Throwable;
 
 /**
  * Copies a bundled design into the application and registers it in config.
@@ -22,7 +23,7 @@ final readonly class ThemeScaffolder
     ) {}
 
     /**
-     * @return array{config: string, path: string, theme: string}
+     * @return array{config: string, defaultChanged: bool, path: string, theme: string}
      */
     public function make(
         string $name,
@@ -52,7 +53,7 @@ final readonly class ThemeScaffolder
 
         $contents = $this->files->get($this->configPath);
 
-        if ($this->hasDesign($contents, $name)) {
+        if ($this->hasDesign($this->configPath, $name)) {
             throw new InvalidArgumentException("The design [{$name}] already exists in {$this->configPath}.");
         }
 
@@ -64,15 +65,32 @@ final readonly class ThemeScaffolder
             throw new InvalidArgumentException("Could not copy the theme to [{$destination}].");
         }
 
-        $contents = $this->insertDesign($contents, $this->designEntry($name, $darkMode, $relativePath));
+        [$indent, $unit] = $this->designIndentation($contents);
+
+        $contents = $this->insertDesign(
+            $contents,
+            $this->designEntry($name, $darkMode, $relativePath, $indent, $unit),
+        );
+
+        $defaultChanged = false;
 
         if (! $keepDefault) {
-            $contents = $this->setDefault($contents, $name);
+            $updated = $this->setDefault($contents, $name);
+
+            if ($updated !== null) {
+                $contents = $updated;
+                $defaultChanged = true;
+            }
         }
 
         $this->files->put($this->configPath, $contents);
 
-        return ['config' => $this->configPath, 'path' => $relativePath, 'theme' => $destination];
+        return [
+            'config' => $this->configPath,
+            'defaultChanged' => $defaultChanged,
+            'path' => $relativePath,
+            'theme' => $destination,
+        ];
     }
 
     private function assertName(string $name): void
@@ -154,9 +172,19 @@ final readonly class ThemeScaffolder
         }
     }
 
-    private function hasDesign(string $contents, string $name): bool
+    private function hasDesign(string $path, string $name): bool
     {
-        return preg_match("/['\"]".preg_quote($name, '/')."['\"]\s*=>/", $contents) === 1;
+        try {
+            $config = $this->files->getRequire($path);
+        } catch (Throwable $exception) {
+            throw new InvalidArgumentException("Could not read the config at [{$path}].", 0, $exception);
+        }
+
+        if (! is_array($config) || ! isset($config['designs']) || ! is_array($config['designs'])) {
+            throw new InvalidArgumentException("The config at [{$path}] must return a designs array.");
+        }
+
+        return array_key_exists($name, $config['designs']);
     }
 
     private function insertDesign(string $contents, string $entry): string
@@ -188,32 +216,53 @@ final readonly class ThemeScaffolder
         throw new InvalidArgumentException('Could not find the designs array in the package configuration.');
     }
 
-    private function setDefault(string $contents, string $name): string
+    private function setDefault(string $contents, string $name): ?string
     {
         $updated = preg_replace(
-            "/('default'\s*=>\s*)'[^']*'/",
+            "/('default'\s*=>\s*)(['\"])([^'\"]*)\\2/",
             "$1'{$name}'",
             $contents,
             1,
             $count,
         );
 
-        if ($count !== 1 || ! is_string($updated)) {
-            throw new InvalidArgumentException('Could not update the default design in the package configuration.');
-        }
-
-        return $updated;
+        return $count === 1 && is_string($updated) ? $updated : null;
     }
 
-    private function designEntry(string $name, string $dark, string $path): string
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function designIndentation(string $contents): array
+    {
+        $designsIndent = '    ';
+
+        if (preg_match("/^([ \t]*)'designs'\s*=>\s*\[/m", $contents, $matches) === 1) {
+            $designsIndent = $matches[1];
+        }
+
+        if (preg_match('/^([ \t]*)\/\/ design-system:designs/m', $contents, $matches) === 1) {
+            $entryIndent = $matches[1];
+        } else {
+            $entryIndent = $designsIndent.'    ';
+        }
+
+        $unit = '    ';
+
+        if (str_starts_with($entryIndent, $designsIndent) && strlen($entryIndent) > strlen($designsIndent)) {
+            $unit = substr($entryIndent, strlen($designsIndent));
+        }
+
+        return [$entryIndent, $unit];
+    }
+
+    private function designEntry(string $name, string $dark, string $path, string $indent, string $unit): string
     {
         $label = Str::headline($name);
-        $indent = '        ';
 
         return $indent."'{$name}' => [\n".
-            $indent."    'label' => '{$label}',\n".
-            $indent."    'path' => '{$path}',\n".
-            $indent."    'dark' => '{$dark}',\n".
+            $indent.$unit."'label' => '{$label}',\n".
+            $indent.$unit."'path' => '{$path}',\n".
+            $indent.$unit."'dark' => '{$dark}',\n".
             $indent."],\n";
     }
 }

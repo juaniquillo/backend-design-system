@@ -247,6 +247,14 @@ It copies the bundled `base` theme to `resources/views/backend-design-system/app
 adds an `app` design with a `path` entry to `config/backend-design-system.php`, and makes
 it the default design.
 
+If no config exists yet, the command publishes the package config, including `base`,
+`base-dark` and `base-dual`. The published file becomes application-owned and will not
+automatically receive new bundled entries from later package releases.
+
+If the existing `default` is not a string literal, for example
+`env('DESIGN_SYSTEM_DEFAULT', 'base')`, the command leaves it unchanged and prints a
+warning. Set the new design as default manually.
+
 Use `--to` to put the theme somewhere else under `resources/`:
 
 ```bash

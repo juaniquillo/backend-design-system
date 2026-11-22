@@ -404,6 +404,13 @@ php artisan design-system:make-theme app
 It copies the bundled `base` theme to `resources/views/backend-design-system/app`,
 adds an app design with a `path` entry to the config, and makes it the default.
 
+If no config exists, the command publishes the package config with the bundled designs.
+That file becomes application-owned and does not receive new bundled entries
+automatically.
+
+If `default` is not a string literal, such as `env('DESIGN_SYSTEM_DEFAULT', 'base')`, the
+command leaves it unchanged and warns; set the new design manually.
+
 Use `--to` for a custom destination under `resources/`:
 
 ```bash

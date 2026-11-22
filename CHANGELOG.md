@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `Field` now wires custom error components with the error id and preserves any existing `aria-describedby` values on the input.
+- `design-system:make-theme` now scopes duplicate detection to the `designs` array, respects existing config indentation, and leaves a non-literal default such as `env()` unchanged.
 
 ### Removed
 
