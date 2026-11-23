@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 use Juaniquillo\BackendDesignSystem\Components\Accordion;
 use Juaniquillo\BackendDesignSystem\Components\Alert;
+use Juaniquillo\BackendDesignSystem\Components\Badge;
 use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
 use Juaniquillo\BackendDesignSystem\Components\Heading;
+use Juaniquillo\BackendDesignSystem\Components\Inline;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Stack;
 use Juaniquillo\BackendDesignSystem\Components\Text;
@@ -29,6 +31,7 @@ it('nests design components in a card without component()', function () {
 
     $view->assertSee('<h2', false)
         ->assertSee('Billing', false)
+        ->assertSee('border-b', false)
         ->assertSee('Your plan renews monthly.', false)
         ->assertSee('Manage', false)
         ->assertSee('border-t', false);
@@ -55,14 +58,19 @@ it('nests a design component in an accordion without component()', function () {
 
     $view = $this->blade('{{ $component }}', [
         'component' => Accordion::make($design)
-            ->summary('Shipping details')
+            ->summary(Inline::make($design)->children([
+                Text::make($design)->text('Shipping details')->inline(),
+                Badge::make($design)->label('New'),
+            ]))
             ->content(Stack::make($design)->children([
                 Text::make($design)->text('Ships in two business days.'),
             ])),
     ]);
 
     $view->assertSee('<details', false)
+        ->assertSee('<summary', false)
         ->assertSee('Shipping details', false)
+        ->assertSee('New', false)
         ->assertSee('Ships in two business days.', false);
 });
 
