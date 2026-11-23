@@ -44,9 +44,13 @@ the `Workbench\` namespace and are never shipped.
 | Path | Purpose |
 |---|---|
 | `src/` | Package source |
+| `src/Console/` | Artisan commands and theme scaffolder |
+| `config/` | Publishable package configuration |
+| `resources/views/backend-design-system/` | Bundled theme files |
+| `resources/boost/skills/` | Boost skill for building UIs with the package |
 | `tests/` | Pest tests (Arch, Feature, Unit) |
 | `workbench/` | Testbench application |
-| `.agents/skills/`, `resources/boost/skills/` | AI skills: `laravel-best-practices` for Laravel code, `backend-design-system-development` for this repository |
+| `.agents/skills/` | Laravel best-practices skill for package development |
 | `bin/pest.php` | Cross-platform Pest runner |
 
 ## Adding a capability

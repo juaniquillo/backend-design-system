@@ -104,12 +104,13 @@ final class Card implements DesignComponent
             ->setTheme('text', 'lg');
     }
 
+    /**
+     * Body and footer are containers, not content: their theme key applies
+     * whether the caller passed text or a component, so padding and the
+     * separating rule survive a component placed inside them.
+     */
     private function section(string|BackendComponent $content, string $variant): BackendComponent
     {
-        if (! is_string($content)) {
-            return $content;
-        }
-
         return $this->makeComponent(ComponentEnum::DIV)
             ->setThemeManager($this->design->themeManager)
             ->setContent($content)

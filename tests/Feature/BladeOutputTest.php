@@ -2,20 +2,30 @@
 
 declare(strict_types=1);
 
+use Juaniquillo\BackendDesignSystem\Components\Accordion;
 use Juaniquillo\BackendDesignSystem\Components\Alert;
 use Juaniquillo\BackendDesignSystem\Components\Badge;
+use Juaniquillo\BackendDesignSystem\Components\Breadcrumb;
 use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\Checkbox;
+use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Divider;
 use Juaniquillo\BackendDesignSystem\Components\Field;
 use Juaniquillo\BackendDesignSystem\Components\Form;
+use Juaniquillo\BackendDesignSystem\Components\Heading;
+use Juaniquillo\BackendDesignSystem\Components\Inline;
 use Juaniquillo\BackendDesignSystem\Components\Input;
 use Juaniquillo\BackendDesignSystem\Components\Label;
+use Juaniquillo\BackendDesignSystem\Components\Link;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Select;
+use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Text;
 use Juaniquillo\BackendDesignSystem\Components\Textarea;
 use Juaniquillo\BackendDesignSystem\Designs\Design;
 use Juaniquillo\BackendDesignSystem\Theme\AlertVariant;
+use Juaniquillo\BackendDesignSystem\Theme\HeadingLevel;
 
 it('renders the expected blade output', function (callable $factory, array $assertions) {
     $design = $this->app->make(Design::class);
@@ -42,6 +52,13 @@ it('renders state and accessibility attributes', function (callable $factory, ar
 })->with('component states');
 
 dataset('component markup', [
+    'accordion' => [
+        fn (Design $design) => Accordion::make($design)
+            ->summary('Details')
+            ->content('Hidden content')
+            ->open(),
+        ['<details', 'open="open"', '<summary', 'Details', '</summary>', 'Hidden content', '</details>'],
+    ],
     'alert' => [
         fn (Design $design) => Alert::make($design)->title('Notice')->body('Your trial ends soon.'),
         ['<div', '<b', 'Notice', '</b>', '<p', 'Your trial ends soon.', '</p>', '</div>'],
@@ -49,6 +66,26 @@ dataset('component markup', [
     'badge' => [
         fn (Design $design) => Badge::make($design)->label('New'),
         ['<span', 'New', '</span>'],
+    ],
+    'breadcrumb' => [
+        fn (Design $design) => Breadcrumb::make($design)->items([
+            ['label' => 'Home', 'href' => '/'],
+            ['label' => 'Docs', 'href' => '/docs'],
+            ['label' => 'Current'],
+        ]),
+        [
+            'role="navigation"',
+            'aria-label="Breadcrumb"',
+            '<ol',
+            '<li',
+            'href="/"',
+            'Home',
+            'href="/docs"',
+            'Docs',
+            'aria-current="page"',
+            'Current',
+            '</ol>',
+        ],
     ],
     'button' => [
         fn (Design $design) => Button::make($design)->label('Save')->type('submit'),
@@ -78,6 +115,36 @@ dataset('component markup', [
             'I accept the terms',
             '</label>',
         ],
+    ],
+    'choice-group' => [
+        fn (Design $design) => ChoiceGroup::make($design)
+            ->legend('Plan')
+            ->choices([
+                Radio::make($design)->name('plan')->value('free')->label('Free'),
+                Radio::make($design)->name('plan')->value('pro')->label('Pro'),
+            ])
+            ->error('Choose a plan.')
+            ->id('plan'),
+        [
+            '<fieldset',
+            'id="plan"',
+            '<legend',
+            'Plan',
+            '</legend>',
+            'type="radio"',
+            'name="plan"',
+            'Free',
+            'Pro',
+            'aria-invalid="true"',
+            'aria-describedby="plan-error"',
+            'id="plan-error"',
+            'Choose a plan.',
+            '</fieldset>',
+        ],
+    ],
+    'divider' => [
+        fn (Design $design) => Divider::make($design),
+        ['<div', 'role="separator"'],
     ],
     'field' => [
         fn (Design $design) => Field::make($design)
@@ -119,6 +186,17 @@ dataset('component markup', [
             '</form>',
         ],
     ],
+    'heading' => [
+        fn (Design $design) => Heading::make($design)->text('Section')->level(HeadingLevel::H2),
+        ['<h2', 'Section', '</h2>'],
+    ],
+    'inline' => [
+        fn (Design $design) => Inline::make($design)->children([
+            Button::make($design)->label('One'),
+            Button::make($design)->label('Two'),
+        ]),
+        ['<div', '<button', 'One', 'Two', '</div>'],
+    ],
     'input' => [
         fn (Design $design) => Input::make($design)
             ->name('email')
@@ -138,6 +216,10 @@ dataset('component markup', [
     'label' => [
         fn (Design $design) => Label::make($design)->text('Email')->for('email'),
         ['<label', 'for="email"', 'Email', '</label>'],
+    ],
+    'link' => [
+        fn (Design $design) => Link::make($design)->label('Docs')->href('/docs'),
+        ['<a', 'href="/docs"', 'Docs', '</a>'],
     ],
     'radio' => [
         fn (Design $design) => Radio::make($design)
@@ -166,6 +248,17 @@ dataset('component markup', [
             '</select>',
         ],
     ],
+    'stack' => [
+        fn (Design $design) => Stack::make($design)->children([
+            Text::make($design)->text('One'),
+            Text::make($design)->text('Two'),
+        ]),
+        ['<div', '<p', 'One', 'Two', '</div>'],
+    ],
+    'text' => [
+        fn (Design $design) => Text::make($design)->text('Body copy'),
+        ['<p', 'Body copy', '</p>'],
+    ],
     'textarea' => [
         fn (Design $design) => Textarea::make($design)
             ->name('notes')
@@ -189,6 +282,26 @@ dataset('component states', [
     'disabled button' => [
         fn (Design $design) => Button::make($design)->label('Save')->disabled(),
         ['disabled="disabled"'],
+    ],
+    'loading button' => [
+        fn (Design $design) => Button::make($design)->label('Saving')->loading(),
+        ['disabled="disabled"', 'aria-busy="true"', 'cursor-wait'],
+    ],
+    'current link' => [
+        fn (Design $design) => Link::make($design)->label('Docs')->href('/docs')->current(),
+        ['aria-current="page"'],
+    ],
+    'external link' => [
+        fn (Design $design) => Link::make($design)->label('Docs')->href('https://example.com')->external(),
+        ['target="_blank"', 'rel="noopener noreferrer"'],
+    ],
+    'inline text' => [
+        fn (Design $design) => Text::make($design)->text('Inline')->inline(),
+        ['<span', 'Inline', '</span>'],
+    ],
+    'heading clamp' => [
+        fn (Design $design) => Heading::make($design)->text('Deep')->level(9),
+        ['<h6', 'Deep', '</h6>'],
     ],
     'disabled input' => [
         fn (Design $design) => Input::make($design)->name('email')->disabled(),
@@ -219,3 +332,18 @@ dataset('component states', [
         ['role="status"'],
     ],
 ]);
+
+it('keeps the footer theme around a component footer', function () {
+    // The footer is a container, not content: a component placed inside it
+    // must not escape the padding and the separating rule.
+    $design = $this->app->make(Design::class);
+
+    $view = $this->blade('{{ $component }}', [
+        'component' => Card::make($design)
+            ->title('Billing')
+            ->footer(Button::make($design)->label('Manage')->component()),
+    ]);
+
+    $view->assertSee('border-t', false)
+        ->assertSee('Manage', false);
+});

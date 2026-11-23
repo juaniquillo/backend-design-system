@@ -1,6 +1,8 @@
 <?php
 
+use Juaniquillo\BackendDesignSystem\Theme\Look;
+
 // Base dark: plain label, inherits its color.
 return [
-    'default' => 'text-sm font-medium',
+    Look::Default->value => 'text-sm font-medium',
 ];
