@@ -76,7 +76,7 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 
 | Component | Methods |
 |---|---|
-| `Accordion` | `summary(string)`, `content()`, `open(bool)` |
+| `Accordion` | `summary()`, `content()`, `open(bool)` |
 | `Alert` | `variant(AlertVariant)`, `title()`, `body()`, `live(bool)` |
 | `Badge` | `label(string)`, `variant(BadgeVariant)` |
 | `Breadcrumb` | `items(array)` |

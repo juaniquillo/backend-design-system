@@ -64,10 +64,10 @@ final class Card implements DesignComponent
 
         if ($title !== null) {
             // A string title is a heading, so cards take part in the
-            // document outline. A component title is whatever its author
-            // built.
+            // document outline. A component title keeps the card's title
+            // chrome and brings whatever it built.
             $contents[] = $title instanceof BackendComponent
-                ? $title
+                ? $this->section($title, 'title')
                 : $this->heading($title);
         }
 
@@ -106,9 +106,9 @@ final class Card implements DesignComponent
     }
 
     /**
-     * Body and footer are containers, not content: their theme key applies
+     * Card sections are containers, not content: their theme key applies
      * whether the caller passed text or a component, so padding and the
-     * separating rule survive a component placed inside them.
+     * separating rules survive a component placed inside them.
      */
     private function section(string|BackendComponent $content, string $variant): BackendComponent
     {
