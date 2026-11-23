@@ -332,3 +332,18 @@ dataset('component states', [
         ['role="status"'],
     ],
 ]);
+
+it('keeps the footer theme around a component footer', function () {
+    // The footer is a container, not content: a component placed inside it
+    // must not escape the padding and the separating rule.
+    $design = $this->app->make(Design::class);
+
+    $view = $this->blade('{{ $component }}', [
+        'component' => Card::make($design)
+            ->title('Billing')
+            ->footer(Button::make($design)->label('Manage')->component()),
+    ]);
+
+    $view->assertSee('border-t', false)
+        ->assertSee('Manage', false);
+});
