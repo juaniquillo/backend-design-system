@@ -5,13 +5,6 @@ All notable changes to `backend-design-system` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed
-
-- The bundled designs' badges are chips: padded edges and small type, so a badge no longer reads as coloured text.
-- `Card` body and footer keep their section theme when the content is a component, so padding and the separating rule survive a component footer.
-
 ## [0.1.0] - 2026-11-22
 
 ### Added
@@ -29,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The bundled designs' badges are chips: padded edges and small type, so a badge no longer reads as coloured text.
+- `Card` body and footer keep their section theme when the content is a component, so padding and the separating rule survive a component footer.
 - Package classes now live under `Juaniquillo\BackendDesignSystem`, grouped into `Components`, `Concerns`, `Contracts`, `Designs` and `Theme`.
 - `Button::make()` and the other components resolve the bound `Design` when none is passed.
 
