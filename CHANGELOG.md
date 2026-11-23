@@ -5,8 +5,6 @@ All notable changes to `backend-design-system` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
 ## [0.1.0] - 2026-11-22
 
 ### Added
@@ -18,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Text`, `Heading`, `Link`, `Divider`, `Stack`, `Inline`, `Accordion`, `Breadcrumb` and `ChoiceGroup` components, with theme files for all three designs.
 - `State::Loading` and `State::Current`, plus `Button::loading()`, `Link::current()` and `Link::external()`.
 - `HeadingLevel` for type-safe heading theme keys.
+- Content slots accept design components directly, so `component()` is no longer needed to nest a component.
 - Independent publish tags for the config, all themes, and each bundled design.
 - `design-system:make-theme` to scaffold an application theme and register it in config.
 - `--to` on `design-system:make-theme` for a custom destination under `resources/`.
@@ -26,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The bundled designs' badges are chips: padded edges and small type, so a badge no longer reads as coloured text.
 - `Card` body and footer keep their section theme when the content is a component, so padding and the separating rule survive a component footer.
+- `Card` titles built from components keep the card's title chrome, matching body and footer.
 - Package classes now live under `Juaniquillo\BackendDesignSystem`, grouped into `Components`, `Concerns`, `Contracts`, `Designs` and `Theme`.
 - `Button::make()` and the other components resolve the bound `Design` when none is passed.
 
@@ -37,8 +37,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - `DesignRegistry` and `DesignSystemCollection`; the package no longer ships a showcase.
-
-### Changed
-
-- Slot methods on `Card`, `Field`, `Alert`, `Accordion` and `ChoiceGroup` accept design components directly, so nesting no longer requires `component()`.
-- Removed the redundant `attributes` property declarations; `IsDesignComponent` is its single source.
