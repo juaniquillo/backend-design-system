@@ -5,6 +5,13 @@ All notable changes to `backend-design-system` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Slot methods on `Card`, `Field`, `Alert`, `Accordion` and `ChoiceGroup` accept design components directly, so nesting no longer requires `component()`.
+- Removed the redundant `attributes` property declarations; `IsDesignComponent` is its single source.
+
 ## [0.1.0] - 2026-11-22
 
 ### Added

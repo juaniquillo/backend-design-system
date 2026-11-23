@@ -337,8 +337,8 @@ Badge::make()->label('Active')->variant(BadgeVariant::Success);
 
 ### Cards and composition
 
-`component()` returns the underlying backend component, which is what nested slots
-accept:
+Slots take strings, design components or backend components, so a component nests
+inside another without `component()`:
 
 `Card::titleLevel()` defaults to 3 and is clamped to the six HTML heading levels.
 
@@ -349,14 +349,17 @@ use Juaniquillo\BackendDesignSystem\Components\Button;
 echo Card::make()
     ->title('Billing')
     ->body('Your plan renews on the first of every month.')
-    ->footer(Button::make()->label('Manage')->component());
+    ->footer(Button::make()->label('Manage'));
 ```
+
+`component()` remains available when you need the underlying backend component's
+full API (attributes, themes, Livewire) before a slot takes it.
 
 ### Forms and fields
 
-`Field::input()` accepts either a control name or a built component. `Field` owns the
-label/control association, so it writes `id`, `for`, `required` and the error `aria`
-attributes onto the control you give it.
+`Field::input()` accepts a control name, a design component or a built backend
+component. `Field` owns the label/control association, so it writes `id`, `for`,
+`required` and the error `aria` attributes onto the control you give it.
 
 ```php
 use Juaniquillo\BackendDesignSystem\Components\Checkbox;
