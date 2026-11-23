@@ -7,11 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- Slot methods on `Card`, `Field`, `Alert`, `Accordion` and `ChoiceGroup` accept design components directly, so nesting no longer requires `component()`.
-- Removed the redundant `attributes` property declarations; `IsDesignComponent` is its single source.
-
 ## [0.1.0] - 2026-11-22
 
 ### Added
@@ -43,3 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `DesignRegistry` and `DesignSystemCollection`; the package no longer ships a showcase.
 
+### Changed
+
+- Slot methods on `Card`, `Field`, `Alert`, `Accordion` and `ChoiceGroup` accept design components directly, so nesting no longer requires `component()`.
+- Removed the redundant `attributes` property declarations; `IsDesignComponent` is its single source.
