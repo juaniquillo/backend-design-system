@@ -83,6 +83,20 @@ dataset('bundled designs', [
     'base-dual' => ['base-dual'],
 ]);
 
+it('shapes every badge as a chip', function (string $designKey) {
+    // A badge is a chip, not coloured text: the padding and small type are
+    // part of the design, so a new bundled design has to carry them too.
+    config(['backend-design-system.default' => $designKey]);
+
+    $this->app->forgetInstance(Design::class);
+
+    $badges = require $this->app->make(Design::class)->themeManager->getThemePath().'/badge.blade.php';
+
+    foreach ($badges as $variant => $classes) {
+        expect($classes)->toContain('px-', 'py-', 'text-xs');
+    }
+})->with('bundled designs');
+
 dataset('theme keys', [
     'accordion' => ['accordion', ['container', 'summary', 'content']],
     'alert' => ['alert', array_map(fn (AlertVariant $case): string => $case->value, AlertVariant::cases())],
