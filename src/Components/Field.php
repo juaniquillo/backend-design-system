@@ -14,34 +14,31 @@ final class Field implements DesignComponent
 {
     use IsDesignComponent;
 
-    private string|BackendComponent|null $label = null;
+    private string|DesignComponent|BackendComponent|null $label = null;
 
-    private string|BackendComponent|null $input = null;
+    private string|DesignComponent|BackendComponent|null $input = null;
 
-    private string|BackendComponent|null $error = null;
+    private string|DesignComponent|BackendComponent|null $error = null;
 
     private ?string $id = null;
 
     private bool $required = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
-    public function label(string|BackendComponent $label): static
+    public function label(string|DesignComponent|BackendComponent $label): static
     {
         $this->label = $label;
 
         return $this;
     }
 
-    public function input(string|BackendComponent $input): static
+    public function input(string|DesignComponent|BackendComponent $input): static
     {
         $this->input = $input;
 
         return $this;
     }
 
-    public function error(string|BackendComponent|null $error): static
+    public function error(string|DesignComponent|BackendComponent|null $error): static
     {
         $this->error = $error;
 
@@ -64,9 +61,11 @@ final class Field implements DesignComponent
 
     protected function build(): MainBackendComponent
     {
-        $label = $this->label;
-        $input = $this->input;
-        $error = $this->error;
+        // Slots are unwrapped here, so the association logic below only
+        // ever sees strings and backend components.
+        $label = $this->label === null ? null : $this->unwrap($this->label);
+        $input = $this->input === null ? null : $this->unwrap($this->input);
+        $error = $this->error === null ? null : $this->unwrap($this->error);
 
         // An explicit id wins; otherwise the control lends its name, whether
         // it is a string or a passed-in component, and a component's own id

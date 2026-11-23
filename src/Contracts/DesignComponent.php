@@ -11,12 +11,13 @@ use Juaniquillo\BaseBackendComponent\Contracts\BackendComponent;
  * A design-system component: fixed named slots in, a plain backend
  * component out.
  *
- * A slot takes a string or any backend component, so composition stays
- * open. Whatever the slots do not cover happens on the returned
- * component, which carries the whole package API (attributes, themes,
- * Livewire). Interaction attributes for the primary element go through
- * attributes(), applied after structure and themes so they merge
- * instead of replacing.
+ * A slot takes a string, any design component or any backend component,
+ * so composition stays open: a design component is unwrapped to the
+ * backend component it builds. Whatever the slots do not cover happens
+ * on the returned component, which carries the whole package API
+ * (attributes, themes, Livewire). Interaction attributes for the primary
+ * element go through attributes(), applied after structure and themes so
+ * they merge instead of replacing.
  *
  * Field is the exception to "slots are taken as given": it owns the
  * label/control association, so it writes id, for, required and aria onto

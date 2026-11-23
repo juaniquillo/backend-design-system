@@ -18,9 +18,6 @@ final class Label implements DesignComponent
 
     private ?string $for = null;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function text(string $text): static
     {
         $this->text = $text;

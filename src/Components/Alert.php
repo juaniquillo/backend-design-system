@@ -18,14 +18,11 @@ final class Alert implements DesignComponent
 
     private AlertVariant $variant = AlertVariant::Info;
 
-    private string|BackendComponent|null $title = null;
+    private string|DesignComponent|BackendComponent|null $title = null;
 
-    private string|BackendComponent|null $body = null;
+    private string|DesignComponent|BackendComponent|null $body = null;
 
     private bool $live = false;
-
-    /** @var array<string, int|string> */
-    private array $attributes = [];
 
     public function variant(AlertVariant $variant): static
     {
@@ -34,14 +31,14 @@ final class Alert implements DesignComponent
         return $this;
     }
 
-    public function title(string|BackendComponent $title): static
+    public function title(string|DesignComponent|BackendComponent $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function body(string|BackendComponent $body): static
+    public function body(string|DesignComponent|BackendComponent $body): static
     {
         $this->body = $body;
 
@@ -64,22 +61,25 @@ final class Alert implements DesignComponent
 
     protected function build(): MainBackendComponent
     {
+        $title = $this->title === null ? null : $this->unwrap($this->title);
+        $body = $this->body === null ? null : $this->unwrap($this->body);
+
         $contents = [];
 
-        if ($this->title !== null) {
-            $contents[] = $this->title instanceof BackendComponent
-                ? $this->title
+        if ($title !== null) {
+            $contents[] = $title instanceof BackendComponent
+                ? $title
                 : $this->makeComponent(ComponentEnum::BOLD)
                     ->setThemeManager($this->design->themeManager)
-                    ->setContent($this->title);
+                    ->setContent($title);
         }
 
-        if ($this->body !== null) {
-            $contents[] = $this->body instanceof BackendComponent
-                ? $this->body
+        if ($body !== null) {
+            $contents[] = $body instanceof BackendComponent
+                ? $body
                 : $this->makeComponent(ComponentEnum::PARAGRAPH)
                     ->setThemeManager($this->design->themeManager)
-                    ->setContent($this->body);
+                    ->setContent($body);
         }
 
         $attributes = [];

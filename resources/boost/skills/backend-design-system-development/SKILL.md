@@ -42,7 +42,8 @@ Publishing the themes is what lets Tailwind scan the bundled classes. Use the
 1. Build UI with component objects, not raw HTML.
 2. Use the variant and size enums; never pass raw strings for looks.
 3. Let `make()` resolve the bound design. Pass a `Design` only to override it.
-4. Use `component()` when a component goes inside another component.
+4. Pass design components into slots directly; `component()` is only needed when a
+   slot must receive a bare backend component.
 5. Use `attributes()` for extra HTML or Livewire attributes, not for styling.
 6. Put Tailwind classes in theme files, not in component calls.
 7. Keep form controls inside `Field` when they need labels or error wiring.
@@ -75,7 +76,7 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 
 | Component | Methods |
 |---|---|
-| `Accordion` | `summary(string)`, `content()`, `open(bool)` |
+| `Accordion` | `summary()`, `content()`, `open(bool)` |
 | `Alert` | `variant(AlertVariant)`, `title()`, `body()`, `live(bool)` |
 | `Badge` | `label(string)`, `variant(BadgeVariant)` |
 | `Breadcrumb` | `items(array)` |
@@ -178,18 +179,18 @@ variants. Do not enable it for alerts already present at page load.
 Card::make()
     ->title('Billing')
     ->body('Your plan renews monthly.')
-    ->footer(Button::make()->label('Manage')->component());
+    ->footer(Button::make()->label('Manage'));
 ```
 
-`component()` is required when passing a design component into another component.
-`Card::titleLevel()` defaults to 3 and is clamped to 1–6.
+Slots take strings, design components or backend components, so `component()` is not
+needed to nest a component. `Card::titleLevel()` defaults to 3 and is clamped to 1–6.
 
 ### Field with a built control
 
 ```php
 Field::make()
     ->label('Email')
-    ->input(Input::make()->type('email')->name('email')->component())
+    ->input(Input::make()->type('email')->name('email'))
     ->error('That address is already taken.')
     ->required();
 ```
@@ -563,7 +564,8 @@ bag automatically.
 - Writing raw `<button>` or `<input>` markup instead of using a component.
 - Passing a string like `'primary'` where a `ButtonVariant` case is expected.
 - Adding Tailwind classes with `attributes()` instead of editing or creating a theme.
-- Forgetting `component()` when nesting a component in a card, form or field.
+- Calling `component()` just to nest a component; slots accept design components
+  directly.
 - Forgetting to publish themes, so Tailwind never sees the classes.
 - Editing published bundled themes and expecting the bundled manager to use them.
 - Expecting CSRF or `_method` inputs by default; call `csrf()` and `methodInput()`.

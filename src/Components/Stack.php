@@ -20,9 +20,6 @@ final class Stack implements DesignComponent
 
     private Size $space = Size::Md;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     /**
      * @param  array<int, DesignComponent|BackendComponent>  $children
      */

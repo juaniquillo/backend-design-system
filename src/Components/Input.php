@@ -28,9 +28,6 @@ final class Input implements DesignComponent
 
     private bool $required = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function type(string $type): static
     {
         $this->type = $type;

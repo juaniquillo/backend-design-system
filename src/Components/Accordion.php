@@ -14,23 +14,20 @@ final class Accordion implements DesignComponent
 {
     use IsDesignComponent;
 
-    private string $summary = '';
+    private string|DesignComponent|BackendComponent $summary = '';
 
-    private string|BackendComponent|null $content = null;
+    private string|DesignComponent|BackendComponent|null $content = null;
 
     private bool $open = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
-    public function summary(string $summary): static
+    public function summary(string|DesignComponent|BackendComponent $summary): static
     {
         $this->summary = $summary;
 
         return $this;
     }
 
-    public function content(string|BackendComponent $content): static
+    public function content(string|DesignComponent|BackendComponent $content): static
     {
         $this->content = $content;
 
@@ -46,17 +43,20 @@ final class Accordion implements DesignComponent
 
     protected function build(): MainBackendComponent
     {
+        $summary = $this->unwrap($this->summary);
+        $content = $this->content === null ? null : $this->unwrap($this->content);
+
         $contents = [
             $this->makeComponent(ComponentEnum::SUMMARY)
                 ->setThemeManager($this->design->themeManager)
-                ->setContent($this->summary)
+                ->setContent($summary)
                 ->setTheme('accordion', 'summary'),
         ];
 
-        if ($this->content !== null) {
+        if ($content !== null) {
             $contents[] = $this->makeComponent(ComponentEnum::DIV)
                 ->setThemeManager($this->design->themeManager)
-                ->setContent($this->content)
+                ->setContent($content)
                 ->setTheme('accordion', 'content');
         }
 

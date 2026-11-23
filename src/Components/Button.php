@@ -29,9 +29,6 @@ final class Button implements DesignComponent
 
     private bool $loading = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function label(string $label): static
     {
         $this->label = $label;
