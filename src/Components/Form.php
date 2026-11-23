@@ -27,9 +27,6 @@ final class Form implements DesignComponent
 
     private bool $methodInput = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function action(string $action): static
     {
         $this->action = $action;

@@ -14,9 +14,6 @@ final class Divider implements DesignComponent
 {
     use IsDesignComponent;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     protected function build(): MainBackendComponent
     {
         return $this->makeComponent(ComponentEnum::DIV)

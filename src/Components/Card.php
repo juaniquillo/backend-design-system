@@ -14,32 +14,29 @@ final class Card implements DesignComponent
 {
     use IsDesignComponent;
 
-    private string|BackendComponent|null $title = null;
+    private string|DesignComponent|BackendComponent|null $title = null;
 
-    private string|BackendComponent|null $body = null;
+    private string|DesignComponent|BackendComponent|null $body = null;
 
-    private string|BackendComponent|null $footer = null;
+    private string|DesignComponent|BackendComponent|null $footer = null;
 
     private int $titleLevel = 3;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
-    public function title(string|BackendComponent $title): static
+    public function title(string|DesignComponent|BackendComponent $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function body(string|BackendComponent $body): static
+    public function body(string|DesignComponent|BackendComponent $body): static
     {
         $this->body = $body;
 
         return $this;
     }
 
-    public function footer(string|BackendComponent $footer): static
+    public function footer(string|DesignComponent|BackendComponent $footer): static
     {
         $this->footer = $footer;
 
@@ -59,23 +56,27 @@ final class Card implements DesignComponent
 
     protected function build(): MainBackendComponent
     {
+        $title = $this->title === null ? null : $this->unwrap($this->title);
+        $body = $this->body === null ? null : $this->unwrap($this->body);
+        $footer = $this->footer === null ? null : $this->unwrap($this->footer);
+
         $contents = [];
 
-        if ($this->title !== null) {
+        if ($title !== null) {
             // A string title is a heading, so cards take part in the
             // document outline. A component title is whatever its author
             // built.
-            $contents[] = $this->title instanceof BackendComponent
-                ? $this->title
-                : $this->heading($this->title);
+            $contents[] = $title instanceof BackendComponent
+                ? $title
+                : $this->heading($title);
         }
 
-        if ($this->body !== null) {
-            $contents[] = $this->section($this->body, 'body');
+        if ($body !== null) {
+            $contents[] = $this->section($body, 'body');
         }
 
-        if ($this->footer !== null) {
-            $contents[] = $this->section($this->footer, 'foot');
+        if ($footer !== null) {
+            $contents[] = $this->section($footer, 'foot');
         }
 
         return $this->makeComponent(ComponentEnum::DIV)

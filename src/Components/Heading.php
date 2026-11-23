@@ -18,9 +18,6 @@ final class Heading implements DesignComponent
 
     private HeadingLevel $level = HeadingLevel::H2;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function text(string $text): static
     {
         $this->text = $text;

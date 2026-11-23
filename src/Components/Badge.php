@@ -19,9 +19,6 @@ final class Badge implements DesignComponent
 
     private BadgeVariant $variant = BadgeVariant::Default;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function label(string $label): static
     {
         $this->label = $label;

@@ -24,9 +24,6 @@ final class Link implements DesignComponent
 
     private bool $external = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function label(string $label): static
     {
         $this->label = $label;

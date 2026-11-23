@@ -20,9 +20,6 @@ final class Text implements DesignComponent
 
     private bool $inline = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function text(string $text): static
     {
         $this->text = $text;

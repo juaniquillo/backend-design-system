@@ -19,12 +19,9 @@ final class ChoiceGroup implements DesignComponent
     /** @var array<int, DesignComponent|BackendComponent> */
     private array $choices = [];
 
-    private string|BackendComponent|null $error = null;
+    private string|DesignComponent|BackendComponent|null $error = null;
 
     private ?string $id = null;
-
-    /** @var array<string, int|string> */
-    private array $attributes = [];
 
     public function legend(string $legend): static
     {
@@ -43,7 +40,7 @@ final class ChoiceGroup implements DesignComponent
         return $this;
     }
 
-    public function error(string|BackendComponent|null $error): static
+    public function error(string|DesignComponent|BackendComponent|null $error): static
     {
         $this->error = $error;
 
@@ -59,6 +56,8 @@ final class ChoiceGroup implements DesignComponent
 
     protected function build(): MainBackendComponent
     {
+        $errorText = $this->error === null ? null : $this->unwrap($this->error);
+
         $contents = [
             $this->makeComponent(ComponentEnum::LEGEND)
                 ->setThemeManager($this->design->themeManager)
@@ -88,12 +87,12 @@ final class ChoiceGroup implements DesignComponent
             $fieldset->setAttribute('id', $this->id);
         }
 
-        if ($this->error !== null) {
+        if ($errorText !== null) {
             $fieldset->setAttribute('aria-invalid', 'true');
 
             $error = $this->makeComponent(ComponentEnum::DIV)
                 ->setThemeManager($this->design->themeManager)
-                ->setContent($this->error)
+                ->setContent($errorText)
                 ->setTheme('choice-group', 'error');
 
             if ($this->id !== null) {

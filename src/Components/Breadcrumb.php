@@ -17,9 +17,6 @@ final class Breadcrumb implements DesignComponent
     /** @var array<int, array{label: string, href?: string|null}> */
     private array $items = [];
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     /**
      * @param  array<int, array{label: string, href?: string|null}>  $items
      */

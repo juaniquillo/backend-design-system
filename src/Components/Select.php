@@ -27,9 +27,6 @@ final class Select implements DesignComponent
 
     private bool $required = false;
 
-    /** @var array<string, int|string> */
-    private array $attributes = [];
-
     public function name(string $name): static
     {
         $this->name = $name;
