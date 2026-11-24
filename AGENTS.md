@@ -46,6 +46,7 @@ the `Workbench\` namespace and are never shipped.
 | `src/` | Package source |
 | `src/Console/` | Artisan commands and theme scaffolder |
 | `config/` | Publishable package configuration |
+| `docs/` | Component, accessibility and theming documentation |
 | `resources/views/backend-design-system/` | Bundled theme files |
 | `resources/boost/skills/` | Boost skill for building UIs with the package |
 | `tests/` | Pest tests (Arch, Feature, Unit) |
@@ -58,4 +59,4 @@ the `Workbench\` namespace and are never shipped.
 1. Add the class under `src/` (and its tests under `tests/Feature`).
 2. Expose it through the service provider only when it needs container bindings or publishing.
 3. Run `composer qa`.
-4. Update `README.md` usage and `CHANGELOG.md`.
+4. Update `docs/`, `README.md` and `CHANGELOG.md`.
