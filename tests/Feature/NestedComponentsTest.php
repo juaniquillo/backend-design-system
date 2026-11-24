@@ -8,13 +8,18 @@ use Juaniquillo\BackendDesignSystem\Components\Badge;
 use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Dialog;
 use Juaniquillo\BackendDesignSystem\Components\Heading;
 use Juaniquillo\BackendDesignSystem\Components\Inline;
+use Juaniquillo\BackendDesignSystem\Components\Link;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Table;
+use Juaniquillo\BackendDesignSystem\Components\Tabs;
 use Juaniquillo\BackendDesignSystem\Components\Text;
 use Juaniquillo\BackendDesignSystem\Designs\Design;
 use Juaniquillo\BackendDesignSystem\Theme\AlertVariant;
+use Juaniquillo\BackendDesignSystem\Theme\BadgeVariant;
 use Juaniquillo\BackendDesignSystem\Theme\HeadingLevel;
 
 it('nests design components in a card without component()', function () {
@@ -91,4 +96,79 @@ it('nests a design component error in a choice group without component()', funct
         ->assertSee('aria-describedby="plan-error"', false)
         ->assertSee('id="plan-error"', false)
         ->assertSee('Choose a plan.', false);
+});
+
+it('nests design components in a table without component()', function () {
+    $design = $this->app->make(Design::class);
+
+    $view = $this->blade('{{ $component }}', [
+        'component' => Table::make($design)
+            ->caption(Text::make($design)->text('Active users')->inline())
+            ->headers([
+                'User',
+                Text::make($design)->text('Status')->inline(),
+            ])
+            ->rows([
+                [
+                    Link::make($design)->label('Alice')->href('/users/1'),
+                    Badge::make($design)->label('Active')->variant(BadgeVariant::Success),
+                ],
+            ])
+            ->footer([
+                'Total',
+                Badge::make($design)->label('1'),
+            ]),
+    ]);
+
+    $view->assertSee('Active users', false)
+        ->assertSee('Status', false)
+        ->assertSee('href="/users/1"', false)
+        ->assertSee('Alice', false)
+        ->assertSee('Active', false)
+        ->assertSee('Total', false);
+});
+
+it('nests design components in a dialog without component()', function () {
+    $design = $this->app->make(Design::class);
+
+    $view = $this->blade('{{ $component }}', [
+        'component' => Dialog::make($design)
+            ->id('confirm-delete')
+            ->title(Heading::make($design)->text('Delete project')->level(HeadingLevel::H2))
+            ->body(Text::make($design)->text('This action cannot be undone.'))
+            ->footer(Button::make($design)->label('Confirm'))
+            ->open(),
+    ]);
+
+    $view->assertSee('<dialog', false)
+        ->assertSee('id="confirm-delete"', false)
+        ->assertSee('aria-labelledby="confirm-delete-title"', false)
+        ->assertSee('id="confirm-delete-title"', false)
+        ->assertSee('border-b', false)
+        ->assertSee('Delete project', false)
+        ->assertSee('This action cannot be undone.', false)
+        ->assertSee('border-t', false)
+        ->assertSee('Confirm', false);
+});
+
+it('nests a design component in a tab label without component()', function () {
+    $design = $this->app->make(Design::class);
+
+    $view = $this->blade('{{ $component }}', [
+        'component' => Tabs::make($design)->items([
+            [
+                'label' => Inline::make($design)->children([
+                    Text::make($design)->text('Issues')->inline(),
+                    Badge::make($design)->label('4'),
+                ]),
+                'href' => '/issues',
+                'current' => true,
+            ],
+        ]),
+    ]);
+
+    $view->assertSee('href="/issues"', false)
+        ->assertSee('aria-current="page"', false)
+        ->assertSee('Issues', false)
+        ->assertSee('4', false);
 });
