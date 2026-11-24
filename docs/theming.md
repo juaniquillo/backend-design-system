@@ -1,5 +1,7 @@
 # Theming and Configuration
 
+[← Back to README](../README.md) · [← Components and Accessibility](components.md)
+
 A design is a folder of theme files plus a dark-mode rule. Components carry no styling of
 their own: every Tailwind class they render comes from the active design's theme files.
 

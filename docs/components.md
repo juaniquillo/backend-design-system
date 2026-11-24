@@ -1,5 +1,7 @@
 # Components
 
+[← Back to README](../README.md) · [Theming and Configuration →](theming.md)
+
 Every component starts with `make(?Design $design = null)` and accepts extra HTML or
 Livewire attributes through `attributes(array $attributes)`.
 
