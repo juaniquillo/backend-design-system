@@ -10,6 +10,7 @@ use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\Checkbox;
 use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Dialog;
 use Juaniquillo\BackendDesignSystem\Components\Divider;
 use Juaniquillo\BackendDesignSystem\Components\Field;
 use Juaniquillo\BackendDesignSystem\Components\Form;
@@ -21,6 +22,8 @@ use Juaniquillo\BackendDesignSystem\Components\Link;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Select;
 use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Table;
+use Juaniquillo\BackendDesignSystem\Components\Tabs;
 use Juaniquillo\BackendDesignSystem\Components\Text;
 use Juaniquillo\BackendDesignSystem\Components\Textarea;
 use Juaniquillo\BackendDesignSystem\Designs\Design;
@@ -47,6 +50,7 @@ it('renders every component with a bundled design', function (string $key) {
         ChoiceGroup::make($design)->legend('Plan')->choices([
             Radio::make($design)->name('plan')->value('free')->label('Free'),
         ]),
+        Dialog::make($design)->title('Confirm')->body('Are you sure?')->footer('Actions')->open(),
         Divider::make($design),
         Field::make($design)
             ->label('Email')
@@ -68,6 +72,15 @@ it('renders every component with a bundled design', function (string $key) {
         Stack::make($design)->children([
             Text::make($design)->text('One'),
             Text::make($design)->text('Two'),
+        ]),
+        Table::make($design)
+            ->caption('Team members')
+            ->headers(['Name', 'Role'])
+            ->rows([['Alice', 'Admin']])
+            ->footer(['Total', '1']),
+        Tabs::make($design)->items([
+            ['label' => 'General', 'href' => '/settings', 'current' => true],
+            ['label' => 'Billing', 'href' => '/settings/billing'],
         ]),
         Text::make($design)->text('Body copy'),
         Textarea::make($design)->name('notes'),

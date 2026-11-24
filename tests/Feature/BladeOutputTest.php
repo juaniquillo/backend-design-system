@@ -10,6 +10,7 @@ use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\Checkbox;
 use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Dialog;
 use Juaniquillo\BackendDesignSystem\Components\Divider;
 use Juaniquillo\BackendDesignSystem\Components\Field;
 use Juaniquillo\BackendDesignSystem\Components\Form;
@@ -21,6 +22,8 @@ use Juaniquillo\BackendDesignSystem\Components\Link;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Select;
 use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Table;
+use Juaniquillo\BackendDesignSystem\Components\Tabs;
 use Juaniquillo\BackendDesignSystem\Components\Text;
 use Juaniquillo\BackendDesignSystem\Components\Textarea;
 use Juaniquillo\BackendDesignSystem\Designs\Design;
@@ -146,6 +149,27 @@ dataset('component markup', [
         fn (Design $design) => Divider::make($design),
         ['<div', 'role="separator"'],
     ],
+    'dialog' => [
+        fn (Design $design) => Dialog::make($design)
+            ->id('delete-account')
+            ->title('Delete account')
+            ->body('This action cannot be undone.')
+            ->footer('Cancel or confirm')
+            ->open(),
+        [
+            '<dialog',
+            'id="delete-account"',
+            'aria-labelledby="delete-account-title"',
+            'open="open"',
+            '<h2',
+            'id="delete-account-title"',
+            'Delete account',
+            '</h2>',
+            'This action cannot be undone.',
+            'Cancel or confirm',
+            '</dialog>',
+        ],
+    ],
     'field' => [
         fn (Design $design) => Field::make($design)
             ->label('Email')
@@ -255,6 +279,61 @@ dataset('component markup', [
         ]),
         ['<div', '<p', 'One', 'Two', '</div>'],
     ],
+    'table' => [
+        fn (Design $design) => Table::make($design)
+            ->caption('Team members')
+            ->headers(['Name', 'Role'])
+            ->rows([
+                ['Alice', 'Admin'],
+                ['Bob', 'Editor'],
+            ])
+            ->footer(['Total', '2']),
+        [
+            '<table',
+            '<caption',
+            'Team members',
+            '</caption>',
+            '<thead',
+            '<th',
+            'scope="col"',
+            'Name',
+            'Role',
+            '</thead>',
+            '<tbody',
+            '<td',
+            'Alice',
+            'Admin',
+            'Bob',
+            'Editor',
+            '</tbody>',
+            '<tfoot',
+            'Total',
+            '2',
+            '</tfoot>',
+            '</table>',
+        ],
+    ],
+    'tabs' => [
+        fn (Design $design) => Tabs::make($design)->items([
+            ['label' => 'General', 'href' => '/settings', 'current' => true],
+            ['label' => 'Billing', 'href' => '/settings/billing'],
+            ['label' => 'Enterprise'],
+        ]),
+        [
+            'role="navigation"',
+            'aria-label="Tabs"',
+            '<ul',
+            '<li',
+            'href="/settings"',
+            'aria-current="page"',
+            'General',
+            'href="/settings/billing"',
+            'Billing',
+            '<span',
+            'Enterprise',
+            '</ul>',
+        ],
+    ],
     'text' => [
         fn (Design $design) => Text::make($design)->text('Body copy'),
         ['<p', 'Body copy', '</p>'],
@@ -330,6 +409,22 @@ dataset('component states', [
     'live info alert' => [
         fn (Design $design) => Alert::make($design)->variant(AlertVariant::Info)->live()->title('Heads up')->body('Body'),
         ['role="status"'],
+    ],
+    'empty table with colspan' => [
+        fn (Design $design) => Table::make($design)
+            ->headers(['Name', 'Email', 'Role'])
+            ->empty('No members found.'),
+        ['<tbody', '<td', 'colspan="3"', 'No members found.', '</tbody>'],
+    ],
+    'dialog title level clamp' => [
+        fn (Design $design) => Dialog::make($design)->title('Deep')->titleLevel(9),
+        ['<h6', 'Deep', '</h6>'],
+    ],
+    'custom tabs aria label' => [
+        fn (Design $design) => Tabs::make($design)
+            ->label('Account sections')
+            ->items([['label' => 'Profile', 'href' => '/profile']]),
+        ['aria-label="Account sections"'],
     ],
 ]);
 

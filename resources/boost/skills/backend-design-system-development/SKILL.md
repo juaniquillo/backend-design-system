@@ -84,6 +84,7 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 | `Card` | `title()`, `body()`, `footer()`, `titleLevel(int)` |
 | `Checkbox` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `ChoiceGroup` | `legend(string)`, `choices(array)`, `error()`, `id(?string)` |
+| `Dialog` | `title()`, `body()`, `footer()`, `titleLevel(int)`, `open(bool)`, `id(?string)` |
 | `Divider` | attributes only |
 | `Field` | `label()`, `input()`, `error()`, `id()`, `required(bool)` |
 | `Form` | `action()`, `method()`, `fields(array)`, `actions()`, `csrf(bool)`, `methodInput(bool)` |
@@ -95,6 +96,8 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 | `Radio` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `Select` | `name()`, `options(array)`, `value()`, `disabled(bool)`, `required(bool)` |
 | `Stack` | `children(array)`, `space(Size)` |
+| `Table` | `headers(array)`, `rows(array)`, `footer(array)`, `caption()`, `empty()` |
+| `Tabs` | `items(array)`, `label(string)` |
 | `Text` | `text(string)`, `size(Size)`, `inline(bool)` |
 | `Textarea` | `name()`, `rows(int)`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 
@@ -109,6 +112,7 @@ use Juaniquillo\BackendDesignSystem\Components\Button;
 use Juaniquillo\BackendDesignSystem\Components\Card;
 use Juaniquillo\BackendDesignSystem\Components\Checkbox;
 use Juaniquillo\BackendDesignSystem\Components\ChoiceGroup;
+use Juaniquillo\BackendDesignSystem\Components\Dialog;
 use Juaniquillo\BackendDesignSystem\Components\Divider;
 use Juaniquillo\BackendDesignSystem\Components\Field;
 use Juaniquillo\BackendDesignSystem\Components\Form;
@@ -120,6 +124,8 @@ use Juaniquillo\BackendDesignSystem\Components\Link;
 use Juaniquillo\BackendDesignSystem\Components\Radio;
 use Juaniquillo\BackendDesignSystem\Components\Select;
 use Juaniquillo\BackendDesignSystem\Components\Stack;
+use Juaniquillo\BackendDesignSystem\Components\Table;
+use Juaniquillo\BackendDesignSystem\Components\Tabs;
 use Juaniquillo\BackendDesignSystem\Components\Text;
 use Juaniquillo\BackendDesignSystem\Components\Textarea;
 ```
@@ -296,6 +302,35 @@ Breadcrumb::make()->items([
 `Accordion` uses native `<details>`/`<summary>`, so no JavaScript is required. The last
 breadcrumb item is the current page.
 
+### Tables, dialogs and tabs
+
+```php
+Table::make()
+    ->caption('Team members')
+    ->headers(['Name', 'Status'])
+    ->rows([
+        ['Alice', Badge::make()->label('Active')->variant(BadgeVariant::Success)],
+    ])
+    ->empty('No members found.');
+
+Dialog::make()
+    ->id('delete-account')
+    ->title('Delete account')
+    ->body('This action cannot be undone.')
+    ->footer(Button::make()->label('Confirm'))
+    ->open();
+
+Tabs::make()->items([
+    ['label' => 'General', 'href' => '/settings', 'current' => true],
+    ['label' => 'Billing', 'href' => '/settings/billing'],
+]);
+```
+
+`Table` renders `<th scope="col">` headers and spans its `empty()` row across all header
+columns when `rows` is empty. `Dialog` renders a native `<dialog>` element and wires
+`aria-labelledby` when both `id` and `title` are given. `Tabs` renders a navigation list
+with `aria-current="page"` on the active tab.
+
 ### Choice groups
 
 ```php
@@ -469,6 +504,7 @@ Required files and keys:
 | `card` | `container`, `title`, `body`, `foot` |
 | `checkbox` | `container`, `box`, `label` |
 | `choice-group` | `container`, `legend`, `choices`, `error` |
+| `dialog` | `container`, `title`, `body`, `foot` |
 | `divider` | `default` |
 | `field` | `container`, `error` |
 | `form` | `container`, `actions` |
@@ -480,6 +516,8 @@ Required files and keys:
 | `radio` | `container`, `box`, `label` |
 | `select` | `default`, `state.disabled` |
 | `stack` | `container` |
+| `table` | `container`, `table`, `caption`, `head`, `header`, `body`, `row`, `cell`, `foot`, `empty` |
+| `tabs` | `container`, `list`, `item`, `link`, `state.current` |
 | `textarea` | `default`, `state.disabled` |
 | `radius` | `none`, `sm`, `md`, `full` |
 | `space` | `xs`, `sm`, `md`, `lg` |

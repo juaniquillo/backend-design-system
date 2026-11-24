@@ -47,6 +47,7 @@ it('follows the dark mode rule', function (string $designKey) {
             'card',
             'checkbox',
             'choice-group',
+            'dialog',
             'divider',
             'field',
             'heading',
@@ -54,6 +55,8 @@ it('follows the dark mode rule', function (string $designKey) {
             'link',
             'radio',
             'select',
+            'table',
+            'tabs',
             'textarea',
         ] as $file) {
             $themes = require $path.'/'.$file.'.blade.php';
@@ -111,6 +114,7 @@ dataset('theme keys', [
     'card' => ['card', ['container', 'title', 'body', 'foot']],
     'checkbox' => ['checkbox', ['container', 'box', 'label']],
     'choice-group' => ['choice-group', ['container', 'legend', 'choices', 'error']],
+    'dialog' => ['dialog', ['container', 'title', 'body', 'foot']],
     'divider' => ['divider', [Look::Default->value]],
     'field' => ['field', ['container', 'error']],
     'form' => ['form', ['container', 'actions']],
@@ -122,6 +126,8 @@ dataset('theme keys', [
     'radio' => ['radio', ['container', 'box', 'label']],
     'select' => ['select', [Look::Default->value, State::Disabled->value]],
     'stack' => ['stack', ['container']],
+    'table' => ['table', ['container', 'table', 'caption', 'head', 'header', 'body', 'row', 'cell', 'foot', 'empty']],
+    'tabs' => ['tabs', ['container', 'list', 'item', 'link', State::Current->value]],
     'textarea' => ['textarea', [Look::Default->value, State::Disabled->value]],
     'radius' => ['radius', ['none', 'sm', 'md', 'full']],
     'space' => ['space', ['xs', 'sm', 'md', 'lg']],
