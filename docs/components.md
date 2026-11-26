@@ -17,6 +17,7 @@ Livewire attributes through `attributes(array $attributes)`.
 - [Layout](#layout)
 - [Disclosure and breadcrumbs](#disclosure-and-breadcrumbs)
 - [Tables, dialogs and tabs](#tables-dialogs-and-tabs)
+- [Item attributes](#item-attributes)
 - [Choice groups](#choice-groups)
 - [Extra attributes](#extra-attributes)
 - [Accessibility](#accessibility)
@@ -261,6 +262,48 @@ Tabs::make()->items([
 columns when `rows` is empty. `Dialog` renders a native `<dialog>` element and wires
 `aria-labelledby` when both `id` and `title` are given. `Tabs` renders a navigation list
 with `aria-current="page"` on the active tab.
+
+## Item attributes
+
+`Tabs` and `Breadcrumb` accept an optional `attributes` array on each item. The attributes
+land on the generated `<a>` or `<span>` after `href`, `aria-current` and the theme, so
+consumer attributes win on collision. `Breadcrumb` never puts them on the `/` separator.
+
+```php
+use Juaniquillo\BackendDesignSystem\Components\Breadcrumb;
+use Juaniquillo\BackendDesignSystem\Components\Tabs;
+
+Tabs::make()->items([
+    ['label' => 'All', 'href' => '#all', 'current' => true,
+        'attributes' => ['x-on:click.prevent' => "tab = 'all'", 'data-tab' => 'all']],
+]);
+
+Breadcrumb::make()->items([
+    ['label' => 'Home', 'href' => '/', 'attributes' => ['data-crumb' => 'home']],
+    ['label' => 'Current'],
+]);
+```
+
+`Table` accepts `Juaniquillo\BackendComponents\Utils\CellBag` in `headers`, `rows` and
+`footer`. The bag `content` renders like any other cell, `attributes` land on the `<th>`
+or `<td>` last, and `theme` is resolved with `setThemes()` through the design theme
+manager. Rows also accept `['cells' => [...], 'attributes' => [...]]`, with the attributes
+on the `<tr>`; plain numeric rows keep working as before.
+
+```php
+use Juaniquillo\BackendComponents\Utils\CellBag;
+use Juaniquillo\BackendDesignSystem\Components\Table;
+
+Table::make()
+    ->headers(['Name', new CellBag(content: 'Role', attributes: ['data-head' => 'role'])])
+    ->rows([
+        ['Alice', new CellBag(content: 'Admin', attributes: ['data-cell' => 'role'])],
+        ['cells' => ['Bob', 'Editor'], 'attributes' => ['data-row' => 'bob']],
+    ]);
+```
+
+`CellBag` content is `int|string|BackendComponent`, so a design component such as `Badge`
+must be passed through `->component()` before going in a bag.
 
 ## Choice groups
 

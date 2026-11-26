@@ -14,11 +14,11 @@ final class Breadcrumb implements DesignComponent
 {
     use IsDesignComponent;
 
-    /** @var array<int, array{label: string, href?: string|null}> */
+    /** @var array<int, array{label: string, href?: string|null, attributes?: array<string, int|string|null>}> */
     private array $items = [];
 
     /**
-     * @param  array<int, array{label: string, href?: string|null}>  $items
+     * @param  array<int, array{label: string, href?: string|null, attributes?: array<string, int|string|null>}>  $items
      */
     public function items(array $items): static
     {
@@ -53,6 +53,8 @@ final class Breadcrumb implements DesignComponent
             if ($current) {
                 $link->setAttribute('aria-current', 'page');
             }
+
+            $link->setAttributes($item['attributes'] ?? []);
 
             $contents = [$link];
 
