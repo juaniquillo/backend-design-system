@@ -15,13 +15,13 @@ final class Tabs implements DesignComponent
 {
     use IsDesignComponent;
 
-    /** @var array<int, array{label: string|DesignComponent|BackendComponent, href?: string|null, current?: bool}> */
+    /** @var array<int, array{label: string|DesignComponent|BackendComponent, href?: string|null, current?: bool, attributes?: array<string, int|string|null>}> */
     private array $items = [];
 
     private string $label = 'Tabs';
 
     /**
-     * @param  array<int, array{label: string|DesignComponent|BackendComponent, href?: string|null, current?: bool}>  $items
+     * @param  array<int, array{label: string|DesignComponent|BackendComponent, href?: string|null, current?: bool, attributes?: array<string, int|string|null>}>  $items
      */
     public function items(array $items): static
     {
@@ -61,6 +61,8 @@ final class Tabs implements DesignComponent
             if ($current) {
                 $tab->setAttribute('aria-current', 'page');
             }
+
+            $tab->setAttributes($item['attributes'] ?? []);
 
             $list->setContent(
                 $this->makeComponent(ComponentEnum::LI)

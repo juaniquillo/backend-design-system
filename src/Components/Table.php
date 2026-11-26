@@ -6,21 +6,24 @@ namespace Juaniquillo\BackendDesignSystem\Components;
 
 use Juaniquillo\BackendComponents\Enums\ComponentEnum;
 use Juaniquillo\BackendComponents\MainBackendComponent;
+use Juaniquillo\BackendComponents\Utils\CellBag;
 use Juaniquillo\BackendDesignSystem\Concerns\IsDesignComponent;
 use Juaniquillo\BackendDesignSystem\Contracts\DesignComponent;
 use Juaniquillo\BaseBackendComponent\Contracts\BackendComponent;
+
+use function Juaniquillo\BackendComponents\isCellBag;
 
 final class Table implements DesignComponent
 {
     use IsDesignComponent;
 
-    /** @var array<int, string|DesignComponent|BackendComponent> */
+    /** @var array<int, string|int|DesignComponent|BackendComponent|CellBag> */
     private array $headers = [];
 
-    /** @var array<int, array<int, string|DesignComponent|BackendComponent>> */
+    /** @var array<int, array<int, string|int|DesignComponent|BackendComponent|CellBag>|array{cells: array<int, string|int|DesignComponent|BackendComponent|CellBag>, attributes?: array<string, int|string|null>}> */
     private array $rows = [];
 
-    /** @var array<int, string|DesignComponent|BackendComponent> */
+    /** @var array<int, string|int|DesignComponent|BackendComponent|CellBag> */
     private array $footer = [];
 
     private string|DesignComponent|BackendComponent|null $caption = null;
@@ -28,7 +31,7 @@ final class Table implements DesignComponent
     private string|DesignComponent|BackendComponent|null $empty = null;
 
     /**
-     * @param  array<int, string|DesignComponent|BackendComponent>  $headers
+     * @param  array<int, string|int|DesignComponent|BackendComponent|CellBag>  $headers
      */
     public function headers(array $headers): static
     {
@@ -38,7 +41,7 @@ final class Table implements DesignComponent
     }
 
     /**
-     * @param  array<int, array<int, string|DesignComponent|BackendComponent>>  $rows
+     * @param  array<int, array<int, string|int|DesignComponent|BackendComponent|CellBag>|array{cells: array<int, string|int|DesignComponent|BackendComponent|CellBag>, attributes?: array<string, int|string|null>}>  $rows
      */
     public function rows(array $rows): static
     {
@@ -48,7 +51,7 @@ final class Table implements DesignComponent
     }
 
     /**
-     * @param  array<int, string|DesignComponent|BackendComponent>  $footer
+     * @param  array<int, string|int|DesignComponent|BackendComponent|CellBag>  $footer
      */
     public function footer(array $footer): static
     {
@@ -71,6 +74,53 @@ final class Table implements DesignComponent
         return $this;
     }
 
+    private function makeTableCell(ComponentEnum $type, string|int|DesignComponent|BackendComponent|CellBag $cell, string $themeKey): MainBackendComponent
+    {
+        $raw = isCellBag($cell) ? $cell->content : $cell;
+
+        $content = $raw instanceof DesignComponent ? $raw->component() : $raw;
+
+        $component = $this->makeComponent($type)
+            ->setThemeManager($this->design->themeManager)
+            ->setContent($content)
+            ->setTheme('table', $themeKey);
+
+        if (isCellBag($cell) && $cell->theme !== null) {
+            $component->setThemes($cell->theme);
+        }
+
+        if ($type === ComponentEnum::TH) {
+            $component->setAttribute('scope', 'col');
+        }
+
+        if (isCellBag($cell) && $cell->attributes !== null) {
+            $component->setAttributes($cell->attributes);
+        }
+
+        return $component;
+    }
+
+    /**
+     * @param  array<int, string|int|DesignComponent|BackendComponent|CellBag>|array{cells: array<int, string|int|DesignComponent|BackendComponent|CellBag>, attributes?: array<string, int|string|null>}  $row
+     * @return array{cells: array<int, string|int|DesignComponent|BackendComponent|CellBag>, attributes: array<string, int|string|null>}
+     */
+    private function normalizeRow(array $row): array
+    {
+        if (array_key_exists('cells', $row)) {
+            /** @var array{cells: array<int, string|int|DesignComponent|BackendComponent|CellBag>, attributes?: array<string, int|string|null>} $row */
+            return [
+                'cells' => $row['cells'],
+                'attributes' => $row['attributes'] ?? [],
+            ];
+        }
+
+        /** @var array<int, string|int|DesignComponent|BackendComponent|CellBag> $row */
+        return [
+            'cells' => $row,
+            'attributes' => [],
+        ];
+    }
+
     protected function build(): MainBackendComponent
     {
         $sections = [];
@@ -86,11 +136,7 @@ final class Table implements DesignComponent
             $cells = [];
 
             foreach ($this->headers as $header) {
-                $cells[] = $this->makeComponent(ComponentEnum::TH)
-                    ->setThemeManager($this->design->themeManager)
-                    ->setContent($this->unwrap($header))
-                    ->setTheme('table', 'header')
-                    ->setAttribute('scope', 'col');
+                $cells[] = $this->makeTableCell(ComponentEnum::TH, $header, 'header');
             }
 
             $sections[] = $this->makeComponent(ComponentEnum::THEAD)
@@ -108,19 +154,24 @@ final class Table implements DesignComponent
             $bodyRows = [];
 
             foreach ($this->rows as $row) {
+                $normalized = $this->normalizeRow($row);
+
                 $cells = [];
 
-                foreach ($row as $cell) {
-                    $cells[] = $this->makeComponent(ComponentEnum::TD)
-                        ->setThemeManager($this->design->themeManager)
-                        ->setContent($this->unwrap($cell))
-                        ->setTheme('table', 'cell');
+                foreach ($normalized['cells'] as $cell) {
+                    $cells[] = $this->makeTableCell(ComponentEnum::TD, $cell, 'cell');
                 }
 
-                $bodyRows[] = $this->makeComponent(ComponentEnum::TR)
+                $bodyRow = $this->makeComponent(ComponentEnum::TR)
                     ->setThemeManager($this->design->themeManager)
                     ->setContents($cells)
                     ->setTheme('table', 'row');
+
+                if ($normalized['attributes'] !== []) {
+                    $bodyRow->setAttributes($normalized['attributes']);
+                }
+
+                $bodyRows[] = $bodyRow;
             }
 
             $sections[] = $this->makeComponent(ComponentEnum::TBODY)
@@ -154,10 +205,7 @@ final class Table implements DesignComponent
             $cells = [];
 
             foreach ($this->footer as $cell) {
-                $cells[] = $this->makeComponent(ComponentEnum::TD)
-                    ->setThemeManager($this->design->themeManager)
-                    ->setContent($this->unwrap($cell))
-                    ->setTheme('table', 'cell');
+                $cells[] = $this->makeTableCell(ComponentEnum::TD, $cell, 'cell');
             }
 
             $sections[] = $this->makeComponent(ComponentEnum::TFOOT)
