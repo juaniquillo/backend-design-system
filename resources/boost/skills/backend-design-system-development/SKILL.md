@@ -78,9 +78,9 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 |---|---|
 | `Accordion` | `summary()`, `content()`, `open(bool)` |
 | `Alert` | `variant(AlertVariant)`, `title()`, `body()`, `live(bool)` |
-| `Badge` | `label(string)`, `variant(BadgeVariant)` |
+| `Badge` | `label()`, `variant(BadgeVariant)` |
 | `Breadcrumb` | `items(array)` |
-| `Button` | `label(string)`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)`, `loading(bool)` |
+| `Button` | `label()`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)`, `loading(bool)` |
 | `Card` | `title()`, `body()`, `footer()`, `titleLevel(int)` |
 | `Checkbox` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `ChoiceGroup` | `legend(string)`, `choices(array)`, `error()`, `id(?string)` |
@@ -92,7 +92,7 @@ Every component has `make(?Design $design = null)` and `attributes(array $attrib
 | `Inline` | `children(array)`, `space(Size)` |
 | `Input` | `type()`, `name()`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 | `Label` | `text()`, `for()` |
-| `Link` | `label(string)`, `href(string)`, `current(bool)`, `external(bool)` |
+| `Link` | `label()`, `href(string)`, `current(bool)`, `external(bool)` |
 | `Radio` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `Select` | `name()`, `options(array)`, `value()`, `disabled(bool)`, `required(bool)` |
 | `Stack` | `children(array)`, `space(Size)` |
@@ -357,6 +357,62 @@ Button::make()
 
 Use `attributes()` only for HTML or Livewire behaviour. Styling belongs in themes.
 
+### Item attributes
+
+`Tabs` and `Breadcrumb` accept an optional `attributes` array on each item. The
+attributes land on the generated `<a>` or `<span>` after `href`, `aria-current`
+and the theme, so consumer attributes win on collision. `Breadcrumb` never puts
+them on the `/` separator.
+
+```php
+Tabs::make()->items([
+    ['label' => 'All', 'href' => '#all', 'current' => true,
+        'attributes' => ['x-on:click.prevent' => "tab = 'all'", 'data-tab' => 'all']],
+]);
+
+Breadcrumb::make()->items([
+    ['label' => 'Home', 'href' => '/', 'attributes' => ['data-crumb' => 'home']],
+    ['label' => 'Current'],
+]);
+```
+
+`Table` accepts `CellBag` cells plus `['cells' => [...], 'attributes' => [...]]`
+rows with the attributes on the `<tr>`:
+
+```php
+use Juaniquillo\BackendComponents\Utils\CellBag;
+
+Table::make()
+    ->headers(['Name', new CellBag(content: 'Role', attributes: ['data-head' => 'role'])])
+    ->rows([
+        ['Alice', new CellBag(content: 'Admin', attributes: ['data-cell' => 'role'])],
+        ['cells' => ['Bob', 'Editor'], 'attributes' => ['data-row' => 'bob']],
+    ]);
+```
+
+`CellBag` content is `int|string|BackendComponent`. A design component such as
+`Badge` must go through `->component()` before it goes in a bag.
+
+### Component labels
+
+`Link`, `Button`, `Badge`, `Checkbox` and `Radio` labels accept a string, a
+design component or a backend component. Use a component for icon + text instead
+of hand-written HTML. Strings render exactly as before and are still escaped.
+
+```php
+use Juaniquillo\BackendComponents\Enums\ComponentEnum;
+use Juaniquillo\BackendComponents\Factories\ComponentFactory;
+
+Link::make()
+    ->label(
+        ComponentFactory::make(ComponentEnum::SPAN)->setContents([
+            ComponentFactory::make(ComponentEnum::SPAN)->setAttribute('class', 'icon-mask'),
+            ' Documentation',
+        ]),
+    )
+    ->href('/docs');
+```
+
 ## Designs
 
 The provider binds the design selected by `backend-design-system.default`:
@@ -612,6 +668,9 @@ bag automatically.
   communicate progress.
 - Using `current()` on a link that is not the current page.
 - Passing a design to every component instead of relying on the bound design.
+- Hand-writing icon + text HTML inside a link or button instead of a component label.
+- Putting per-item `attributes()` on the `Tabs`/`Breadcrumb` container instead of the item.
+- Passing a design component directly in a `CellBag`; call `->component()` first.
 
 ## Verification
 

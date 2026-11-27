@@ -28,9 +28,9 @@ Livewire attributes through `attributes(array $attributes)`.
 |---|---|
 | `Accordion` | `summary()`, `content()`, `open(bool)` |
 | `Alert` | `variant(AlertVariant)`, `title()`, `body()`, `live(bool)` |
-| `Badge` | `label(string)`, `variant(BadgeVariant)` |
+| `Badge` | `label()`, `variant(BadgeVariant)` |
 | `Breadcrumb` | `items(array)` |
-| `Button` | `label(string)`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)`, `loading(bool)` |
+| `Button` | `label()`, `variant(ButtonVariant)`, `size(Size)`, `type(string)`, `disabled(bool)`, `loading(bool)` |
 | `Card` | `title()`, `body()`, `footer()`, `titleLevel(int)` |
 | `Checkbox` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `ChoiceGroup` | `legend(string)`, `choices(array)`, `error()`, `id(?string)` |
@@ -42,7 +42,7 @@ Livewire attributes through `attributes(array $attributes)`.
 | `Inline` | `children(array)`, `space(Size)` |
 | `Input` | `type()`, `name()`, `value()`, `placeholder()`, `disabled(bool)`, `required(bool)` |
 | `Label` | `text()`, `for()` |
-| `Link` | `label(string)`, `href(string)`, `current(bool)`, `external(bool)` |
+| `Link` | `label()`, `href(string)`, `current(bool)`, `external(bool)` |
 | `Radio` | `name()`, `value()`, `label()`, `checked(bool)`, `disabled(bool)`, `required(bool)` |
 | `Select` | `name()`, `options(array)`, `value()`, `disabled(bool)`, `required(bool)` |
 | `Stack` | `children(array)`, `space(Size)` |
@@ -169,6 +169,8 @@ to that range.
 ## Links and dividers
 
 ```php
+use Juaniquillo\BackendComponents\Enums\ComponentEnum;
+use Juaniquillo\BackendComponents\Factories\ComponentFactory;
 use Juaniquillo\BackendDesignSystem\Components\Divider;
 use Juaniquillo\BackendDesignSystem\Components\Link;
 
@@ -176,8 +178,23 @@ Link::make()->label('Documentation')->href('/docs');
 Link::make()->label('Documentation')->href('/docs')->current();
 Link::make()->label('External')->href('https://example.com')->external();
 
+// Icon + text without hand-written HTML: the label takes a component.
+Link::make()
+    ->label(
+        ComponentFactory::make(ComponentEnum::SPAN)->setContents([
+            ComponentFactory::make(ComponentEnum::SPAN)->setAttribute('class', 'icon-mask'),
+            ' Documentation',
+        ]),
+    )
+    ->href('/docs');
+
 Divider::make();
 ```
+
+`Link::label()`, `Button::label()`, `Badge::label()`, `Checkbox::label()` and
+`Radio::label()` accept a string, a design component or a backend component. A string is
+rendered exactly as before (and still escaped); a component renders its markup inside the
+element, so an icon span and text need no hand-written HTML.
 
 Current links receive `aria-current="page"`. External links receive
 `target="_blank"` and `rel="noopener noreferrer"`.

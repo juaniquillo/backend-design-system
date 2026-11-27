@@ -12,12 +12,13 @@ use Juaniquillo\BackendDesignSystem\Theme\ButtonVariant;
 use Juaniquillo\BackendDesignSystem\Theme\Size;
 use Juaniquillo\BackendDesignSystem\Theme\State;
 use Juaniquillo\BackendDesignSystem\Theme\ThemeVariants;
+use Juaniquillo\BaseBackendComponent\Contracts\BackendComponent;
 
 final class Button implements DesignComponent
 {
     use IsDesignComponent;
 
-    private string $label = '';
+    private string|DesignComponent|BackendComponent $label = '';
 
     private ButtonVariant $variant = ButtonVariant::Default;
 
@@ -29,7 +30,7 @@ final class Button implements DesignComponent
 
     private bool $loading = false;
 
-    public function label(string $label): static
+    public function label(string|DesignComponent|BackendComponent $label): static
     {
         $this->label = $label;
 
@@ -88,7 +89,7 @@ final class Button implements DesignComponent
 
         $button = $this->makeComponent(ComponentEnum::BUTTON)
             ->setThemeManager($this->design->themeManager)
-            ->setContent($this->label)
+            ->setContent($this->unwrap($this->label))
             ->setTheme('button', $variants->all())
             ->setTheme('radius', 'md')
             ->setAttribute('type', $this->type);
