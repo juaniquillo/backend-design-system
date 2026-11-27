@@ -11,12 +11,13 @@ use Juaniquillo\BackendDesignSystem\Contracts\DesignComponent;
 use Juaniquillo\BackendDesignSystem\Theme\Look;
 use Juaniquillo\BackendDesignSystem\Theme\State;
 use Juaniquillo\BackendDesignSystem\Theme\ThemeVariants;
+use Juaniquillo\BaseBackendComponent\Contracts\BackendComponent;
 
 final class Link implements DesignComponent
 {
     use IsDesignComponent;
 
-    private string $label = '';
+    private string|DesignComponent|BackendComponent $label = '';
 
     private string $href = '';
 
@@ -24,7 +25,7 @@ final class Link implements DesignComponent
 
     private bool $external = false;
 
-    public function label(string $label): static
+    public function label(string|DesignComponent|BackendComponent $label): static
     {
         $this->label = $label;
 
@@ -67,7 +68,7 @@ final class Link implements DesignComponent
 
         $link = $this->makeComponent(ComponentEnum::LINK)
             ->setThemeManager($this->design->themeManager)
-            ->setContent($this->label)
+            ->setContent($this->unwrap($this->label))
             ->setTheme('link', $variants->all());
 
         if ($this->href !== '') {

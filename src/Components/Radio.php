@@ -8,6 +8,7 @@ use Juaniquillo\BackendComponents\Enums\ComponentEnum;
 use Juaniquillo\BackendComponents\MainBackendComponent;
 use Juaniquillo\BackendDesignSystem\Concerns\IsDesignComponent;
 use Juaniquillo\BackendDesignSystem\Contracts\DesignComponent;
+use Juaniquillo\BaseBackendComponent\Contracts\BackendComponent;
 
 final class Radio implements DesignComponent
 {
@@ -17,7 +18,7 @@ final class Radio implements DesignComponent
 
     private ?string $value = null;
 
-    private ?string $label = null;
+    private string|DesignComponent|BackendComponent|null $label = null;
 
     private bool $checked = false;
 
@@ -39,7 +40,7 @@ final class Radio implements DesignComponent
         return $this;
     }
 
-    public function label(?string $label): static
+    public function label(string|DesignComponent|BackendComponent|null $label): static
     {
         $this->label = $label;
 
@@ -103,7 +104,7 @@ final class Radio implements DesignComponent
                     ->setThemeManager($this->design->themeManager)
                     ->setTheme('radio', 'label')
                     ->setTheme('text', 'sm')
-                    ->setContent($this->label ?? ''),
+                    ->setContent($this->label !== null ? $this->unwrap($this->label) : ''),
             ]);
 
         return $label->setAttributes($this->attributes);

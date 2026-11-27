@@ -10,16 +10,17 @@ use Juaniquillo\BackendDesignSystem\Concerns\IsDesignComponent;
 use Juaniquillo\BackendDesignSystem\Contracts\DesignComponent;
 use Juaniquillo\BackendDesignSystem\Theme\BadgeVariant;
 use Juaniquillo\BackendDesignSystem\Theme\ThemeVariants;
+use Juaniquillo\BaseBackendComponent\Contracts\BackendComponent;
 
 final class Badge implements DesignComponent
 {
     use IsDesignComponent;
 
-    private string $label = '';
+    private string|DesignComponent|BackendComponent $label = '';
 
     private BadgeVariant $variant = BadgeVariant::Default;
 
-    public function label(string $label): static
+    public function label(string|DesignComponent|BackendComponent $label): static
     {
         $this->label = $label;
 
@@ -37,7 +38,7 @@ final class Badge implements DesignComponent
     {
         return $this->makeComponent(ComponentEnum::SPAN)
             ->setThemeManager($this->design->themeManager)
-            ->setContent($this->label)
+            ->setContent($this->unwrap($this->label))
             ->setTheme('badge', ThemeVariants::make()->look($this->variant)->all())
             ->setTheme('radius', 'sm')
             ->setAttributes($this->attributes);
